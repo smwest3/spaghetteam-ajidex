@@ -53,7 +53,11 @@ create table Restaurant (
     RestaurantAddress varchar(80) NOT NULL,
     RestaurantCity varchar(80) NOT NULL,
     RestaurantState varchar(20) NOT NULL,
+<<<<<<< HEAD
     RestaurantZip varchar(20) NOT NULL,
+=======
+    RestaurantZip int NOT NULL,
+>>>>>>> smwest3
     /*RestaurantWiFi, [type] NOT NULL*/
 )
 
@@ -66,7 +70,11 @@ create table Meal (
     MealID int identity(1,1) primary key,
     MealName varchar(80) NOT NULL,
     MealDescr varchar(255) NOT NULL,
+<<<<<<< HEAD
     RestaurantID int foreign key references Restaurant(RestaurandID),
+=======
+    RestaurantID int foreign key references Restaurant(RestaurantID),
+>>>>>>> smwest3
     MealTypeID int foreign key references MealType(MealTypeID)
 );
 
@@ -79,7 +87,12 @@ create table Texture (
 create table MealTexture (
     MealTextureID int identity(1,1) primary key,
     TextureID int foreign key references Texture(TextureID),
+<<<<<<< HEAD
     MealID int foreign key references Meal(MealID)
+=======
+    MealID int foreign key references Meal(MealID),
+    InputTime DATETIME not null
+>>>>>>> smwest3
 ) 
 
 create table RestaurantCategory (

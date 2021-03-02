@@ -14,6 +14,7 @@ import (
 )
 
 // UsersHandler handles requests for the "users" resource
+//NOTE: ADD TO POST METHOD TO ACCOUNT FOR RESTRICTIONS UPON SIGN-UP
 func (c *HandlerContext) UsersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
@@ -52,6 +53,7 @@ func (c *HandlerContext) UsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // SpecificUserHandler handles requests for a specific user
+//NOTE: CONSIDER REVISING OR REMOVING PATCH METHOD
 func (c *HandlerContext) SpecificUserHandler(w http.ResponseWriter, r *http.Request) {
 	currSession := &SessionState{}
 	sesID, err := sessions.GetState(r, c.Key, c.SessionStore, currSession)
