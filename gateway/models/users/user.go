@@ -83,22 +83,6 @@ func (nu *NewUser) ToUser() (*User, error) {
 	return result, nil
 }
 
-//FullName returns the user's full name, in the form:
-// "<FirstName> <LastName>"
-//If either first or last name is an empty string, no
-//space is put between the names. If both are missing,
-//this returns an empty string
-func (u *User) FullName() string {
-	space := " "
-	if u.FirstName == "" || u.LastName == "" {
-		space = ""
-	}
-	if u.FirstName == "" && u.LastName == "" {
-		return ""
-	}
-	return u.FirstName + space + u.LastName
-}
-
 //SetPassword hashes the password and stores it in the PassHash field
 func (u *User) SetPassword(password string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 13)
