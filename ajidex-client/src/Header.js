@@ -3,12 +3,11 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
-import Dropdown from 'react-bootstrap/Dropdown';
 import Button from 'react-bootstrap/Button';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { LinkContainer } from 'react-router-bootstrap';
 
-//Creates header on main page
+//Creates header 
 export function Header(props) {
   return (
     <div>
@@ -28,7 +27,7 @@ export function Header(props) {
         <Nav>
           <NavDropdown alignRight title="Profile" id="basic-nav-dropdown">
             <LinkContainer to="/profile"><NavDropdown.Item>Profile</NavDropdown.Item></LinkContainer>
-            <LinkContainer to="/diet"><NavDropdown.Item>Diet</NavDropdown.Item></LinkContainer>
+            <LinkContainer to="/diet"><NavDropdown.Item>My Diet</NavDropdown.Item></LinkContainer>
             <NavDropdown.Divider />
             <LinkContainer to="/settings"><NavDropdown.Item>Settings</NavDropdown.Item></LinkContainer>
           </NavDropdown>
