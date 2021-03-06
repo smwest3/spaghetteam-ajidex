@@ -8,20 +8,23 @@ import Home from './Home.js';
 import Diet from './Diet.js';
 import Profile from './Profile.js';
 import Settings from './Settings.js';
+import About from './About.js'
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Header />
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/contact" component={Contact} />
-          <Route exact path="/diet" component={Diet} />
-          <Route exact path="/profile" component={Profile} />
-          <Route exact path="/settings" component={Settings} />
-
-        </Switch>
+        <main>
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route exact path="/about" component={About} />
+            <Route exact path="/contact" component={Contact} />
+            <Route exact path="/diet" component={Diet} />
+            <Route exact path="/profile" component={Profile} />
+            <Route exact path="/settings" component={Settings} />
+          </Switch>
+        </main>
       </BrowserRouter>
     </div>
   );

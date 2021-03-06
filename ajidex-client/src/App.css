@@ -5,3 +5,11 @@
 .searchbtn {
   margin-right: 0.8em;
 }
+
+main {
+  padding-top: 4em;
+}
+
+* {
+  box-sizing: border-box;
+}
