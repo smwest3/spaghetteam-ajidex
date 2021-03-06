@@ -13,3 +13,12 @@ main {
 * {
   box-sizing: border-box;
 }
+
+.menu {
+  padding-left: calc(20vw - 5em);
+  padding-right: calc(20vw - 5em);
+}
+
+.menutitle {
+  text-align: center;
+}

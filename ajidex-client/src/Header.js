@@ -7,7 +7,7 @@ import Button from 'react-bootstrap/Button';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { LinkContainer } from 'react-router-bootstrap';
 
-//Creates header 
+//Creates header
 export function Header(props) {
   return (
     <div>
