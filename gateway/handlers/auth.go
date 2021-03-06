@@ -53,15 +53,9 @@ func (c *HandlerContext) UsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // SpecificUserHandler handles requests for a specific user
-//NOTE: CONSIDER REVISING OR REMOVING PATCH METHOD
+//NOTE: MAY REATTACH PATCH METHOD AT LATER POINT
 func (c *HandlerContext) SpecificUserHandler(w http.ResponseWriter, r *http.Request) {
 	currSession := &SessionState{}
-	sesID, err := sessions.GetState(r, c.Key, c.SessionStore, currSession)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-	currID := currSession.User.ID
 	urlBase := path.Base(r.URL.String())
 	id, _ := strconv.ParseInt(urlBase, 10, 64)
 
@@ -87,36 +81,6 @@ func (c *HandlerContext) SpecificUserHandler(w http.ResponseWriter, r *http.Requ
 		enc := json.NewEncoder(w)
 		enc.Encode(user)
 
-	} else if r.Method == "PATCH" {
-		if urlBase != "me" && id != currID {
-			http.Error(w, "user is not authenticated", http.StatusForbidden)
-			return
-		}
-		if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
-			http.Error(w, "request body must be in JSON", http.StatusUnsupportedMediaType)
-			return
-		}
-		if urlBase == "me" {
-			id = currSession.User.ID
-		}
-		decoder := json.NewDecoder(r.Body)
-		newUpdate := &users.Updates{}
-		decoder.Decode(newUpdate)
-		errFive := currSession.User.ApplyUpdates(newUpdate)
-		if errFive != nil {
-			http.Error(w, errFive.Error(), http.StatusNotFound)
-			return
-		}
-		c.SessionStore.Save(sesID, currSession)
-		user, errFour := c.UserStore.Update(id, newUpdate)
-		if errFour != nil {
-			http.Error(w, errFour.Error(), http.StatusNotFound)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		enc := json.NewEncoder(w)
-		enc.Encode(user)
 	} else {
 		http.Error(w, "invalid request method", http.StatusMethodNotAllowed)
 		return
