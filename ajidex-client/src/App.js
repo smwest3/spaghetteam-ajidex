@@ -10,6 +10,7 @@ import Profile from './Profile.js';
 import Settings from './Settings.js';
 import About from './About.js';
 import Restaurant from './Restaurant.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
