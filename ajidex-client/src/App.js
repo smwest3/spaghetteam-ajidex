@@ -9,7 +9,7 @@ import Diet from './Diet.js';
 import Profile from './Profile.js';
 import Settings from './Settings.js';
 import About from './About.js';
-import Restaurant from './Restaurant.js';
+import Restaurants from './Restaurants.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
             <Route exact path="/diet" component={Diet} />
             <Route exact path="/profile" component={Profile} />
             <Route exact path="/settings" component={Settings} />
-            <Route path="/restaurant" component={Restaurant} />
+            <Route path="/restaurants" component={Restaurants} />
             <Redirect to="/" />
           </Switch>
         </main>
