@@ -13,7 +13,8 @@ import {
 const testRest = {
   Name: "Paddy's Pub",
   Image: "https://i.reddituploads.com/82435827a2e44f7aa2c2782dd20e4ba6?fit=max&h=1536&w=1536&s=d0407d4a63a463e45ee60ddc83f62764",
-  Id: "paddys-pub",
+  Url: "paddys-pub",
+  Address: "",
   Menu: [
     {
       Category: "Appetizers",
@@ -76,8 +77,7 @@ function Restaurant(props) {
     let { restId } = useParams();
 
     // query the backend to get the rest of the info
-    console.log(restId);
-    if (restId != testRest.Id) { return(<Redirect to="/restaurants" />) }
+    if (restId != testRest.Url) { return(<Redirect to="/restaurants" />) }
 
     let menu = testRest.Menu.map((cat) => {
       return (<div key={cat.Category}><h2>{cat.Category}</h2> {
