@@ -19,6 +19,15 @@ main {
   padding-right: calc(20vw - 5em);
 }
 
+.menu h2 {
+  padding-bottom: 0.25em;
+  padding-top: 0.5em;
+}
+
 .menutitle {
   text-align: center;
+}
+
+.menuitem {
+  padding-bottom: 20px;
 }

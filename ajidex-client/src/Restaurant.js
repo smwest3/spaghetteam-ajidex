@@ -1,4 +1,5 @@
 import React from 'react';
+import MenuItem from './MenuItem.js';
 
 function Restaurant(props) {
   return (
@@ -9,9 +10,12 @@ function Restaurant(props) {
       </div>
       <div className="menu">
         <h2>Appetizers</h2>
-        <p>chicken sandwich card</p>
+        <MenuItem />
+        <MenuItem />
         <h2>Meals</h2>
-        <p>potato salad card</p>
+        <MenuItem />
+        <MenuItem />
+        <MenuItem />
       </div>
     </div>
   );
