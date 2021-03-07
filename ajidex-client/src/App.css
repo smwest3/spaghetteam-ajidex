@@ -31,3 +31,7 @@ main {
 .menuitem {
   padding-bottom: 20px;
 }
+
+.menutag {
+  margin-right: 0.25em;
+}
