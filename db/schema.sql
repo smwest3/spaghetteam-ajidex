@@ -1,3 +1,7 @@
+create database ajidex-db
+
+use ajidex-db
+
 create table Users (
     UserID int identity(1,1) primary key,
     UserEmail varchar(80) NOT NULL,
@@ -54,6 +58,7 @@ create table Restaurant (
     RestaurantCity varchar(80) NOT NULL,
     RestaurantState varchar(20) NOT NULL,
     RestaurantZip int NOT NULL,
+    RestaurantImg nvarchar(500)
     /*RestaurantWiFi, [type] NOT NULL*/
 )
 
@@ -66,8 +71,16 @@ create table Meal (
     MealID int identity(1,1) primary key,
     MealName varchar(80) NOT NULL,
     MealDescr varchar(255) NOT NULL,
+    MealCal int NOT NULL,
+    MealImg nvarchar(500),
     RestaurantID int foreign key references Restaurant(RestaurantID),
     MealTypeID int foreign key references MealType(MealTypeID)
+);
+
+create table MealIngredient (
+    MealIngredientID int identity (1,1) primary key,
+    MealID int foreign key references Meal(MealID),
+    IngredientID int references Ingredient(IngredientID)
 );
 
 create table Texture (
@@ -79,12 +92,7 @@ create table Texture (
 create table MealTexture (
     MealTextureID int identity(1,1) primary key,
     TextureID int foreign key references Texture(TextureID),
-<<<<<<< HEAD
     MealID int foreign key references Meal(MealID)
-=======
-    MealID int foreign key references Meal(MealID),
-    InputTime DATETIME not null
->>>>>>> smwest3
 ) 
 
 create table RestaurantCategory (
