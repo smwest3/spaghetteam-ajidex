@@ -101,8 +101,8 @@ type Meal struct {
 }
 
 //GetNearbyRestaurants returns all restaurants within the given zipcode
-func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]Restaurant, error) {
-	var output []Restaurant
+func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]*Restaurant, error) {
+	var output []*Restaurant
 	inq := "select * from Restaurants where RestaurantZip=?"
 	rows, err := store.db.QueryContext(context.Background(), inq, zipcode)
 	if err != nil {
@@ -110,9 +110,13 @@ func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]Restaurant, error) 
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisRestaurant Restaurant
+		var thisRestaurant *Restaurant
 		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
 			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+			return nil, err
+		}
+		thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
+		if err != nil {
 			return nil, err
 		}
 		//future consideration: GIS capabilities
@@ -125,8 +129,8 @@ func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]Restaurant, error) 
 }
 
 //GetAllRestaurants returns all restaurants within the given zipcode
-func (store SQLStore) GetAllRestaurants() ([]Restaurant, error) {
-	var output []Restaurant
+func (store SQLStore) GetAllRestaurants() ([]*Restaurant, error) {
+	var output []*Restaurant
 	inq := "select * from Restaurants"
 	rows, err := store.db.QueryContext(context.Background(), inq)
 	if err != nil {
@@ -134,9 +138,13 @@ func (store SQLStore) GetAllRestaurants() ([]Restaurant, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisRestaurant Restaurant
+		var thisRestaurant *Restaurant
 		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
 			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+			return nil, err
+		}
+		thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
+		if err != nil {
 			return nil, err
 		}
 		//future consideration: GIS capabilities
@@ -161,10 +169,14 @@ func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error
 	for rows.Next() {
 		var thisRestaurant *Restaurant
 		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-			&thisRestaurant.State, &thisRestaurant.Zip); err != nil {
+			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
 			return nil, err
 		}
 		//future consideration: GIS capabilities
+		thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
+		if err != nil {
+			return nil, err
+		}
 		output = append(output, thisRestaurant)
 	}
 	if err = rows.Err(); err != nil {
@@ -175,25 +187,21 @@ func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error
 
 //GetRestaurantByID returns all restaurants with given name
 // **NOTE: may rewrite so it only returns one row
-func (store SQLStore) GetRestaurantByID(restID int64) ([]Restaurant, error) {
-	var output []Restaurant
+func (store SQLStore) GetRestaurantByID(restID int64) (*Restaurant, error) {
+	var output *Restaurant
+	var err error
 	inq := "select * from Restaurants where RestaurantID=?"
-	rows, err := store.db.QueryContext(context.Background(), inq, restID)
+	row := store.db.QueryRowContext(context.Background(), inq, restID)
+	var thisRestaurant *Restaurant
+	if err := row.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
+		&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+		return thisRestaurant, err
+	}
+	thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	for rows.Next() {
-		var thisRestaurant Restaurant
-		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-			&thisRestaurant.State, &thisRestaurant.Zip); err != nil {
-			return nil, err
-		}
-		//future consideration: GIS capabilities
-		//GetRestaurantMenu
-		output = append(output, thisRestaurant)
-	}
-	if err = rows.Err(); err != nil {
+	if err := row.Err(); err != nil {
 		return nil, err
 	}
 	return output, nil
@@ -201,10 +209,6 @@ func (store SQLStore) GetRestaurantByID(restID int64) ([]Restaurant, error) {
 
 //GetRestaurantMenu returns a Menu struct with all the meals a restaurant offers by category
 func (store SQLStore) GetRestaurantMenu(restID int64) (*Menu, error) {
-	//Create Menu struct
-	//execute MenuCategories
-	//execute MenuItem
-	//organize and return output
 	var output *Menu
 	menuMap, err := store.GetMenuItems(restID)
 	if err != nil {
@@ -221,9 +225,7 @@ func (store SQLStore) GetRestaurantMenu(restID int64) (*Menu, error) {
 	return output, nil
 }
 
-//GetMenuCategories
-
-//GetMenuItems -- return map here
+//GetMenuItems returns a map with string meal category keys and slices of MenuItems as values
 func (store SQLStore) GetMenuItems(restID int64) (map[string][]*MenuItem, error) {
 	var output map[string][]*MenuItem
 	Meals, err := store.GetRestaurantMeals(restID)
@@ -248,8 +250,8 @@ func (store SQLStore) GetMenuItems(restID int64) (map[string][]*MenuItem, error)
 	return output, nil
 }
 
-//MealtoMenuItem
-func (store SQLStore) MealtoMenuItem(baseMeal Meal) (*MenuItem, error) {
+//MealtoMenuItem converts an inputted Meal struct into a MenuItem struct
+func (store SQLStore) MealtoMenuItem(baseMeal *Meal) (*MenuItem, error) {
 	var output *MenuItem
 	var subErr error
 	output.Name, output.Descr, output.Calories, output.Img = baseMeal.Name, baseMeal.Descr, baseMeal.Calories, baseMeal.Img
@@ -268,7 +270,7 @@ func (store SQLStore) MealtoMenuItem(baseMeal Meal) (*MenuItem, error) {
 	return output, nil
 }
 
-//GetMealIngredients
+//GetMealIngredients returns the names of ingredients of the meal with the given ID in slice format
 func (store SQLStore) GetMealIngredients(mealID int64) ([]string, error) {
 	var output []string
 	ingredInq := `select I.IngredientName 
@@ -288,10 +290,13 @@ func (store SQLStore) GetMealIngredients(mealID int64) ([]string, error) {
 		}
 		output = append(output, ingredient)
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return output, nil
 }
 
-//GetMealDiet
+//GetMealDiet returns the name of restrictions the meal ingredients are part of, given a meal ID
 func (store SQLStore) GetMealDiet(mealID int64) ([]string, error) {
 	var output []string
 	dietInq := `select R.RestrictionName
@@ -313,10 +318,13 @@ func (store SQLStore) GetMealDiet(mealID int64) ([]string, error) {
 		}
 		output = append(output, diet)
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return output, nil
 }
 
-//GetMealTextures
+//GetMealTextures returns the names of textures of the meal with the given ID in slice format
 func (store SQLStore) GetMealTextures(mealID int64) ([]string, error) {
 	var output []string
 	textInq := `select T.TextureName 
@@ -336,10 +344,13 @@ func (store SQLStore) GetMealTextures(mealID int64) ([]string, error) {
 		}
 		output = append(output, texture)
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return output, nil
 }
 
-//GetMealType
+//GetMealType returns the mealtype of the given meal in string format
 func (store SQLStore) GetMealType(mealID int64) (string, error) {
 	var output string
 	mealTypeInq := `select MT.MealTypeName
@@ -350,12 +361,15 @@ func (store SQLStore) GetMealType(mealID int64) (string, error) {
 	if err := row.Scan(&output); err != nil {
 		return output, err
 	}
+	if err := row.Err(); err != nil {
+		return output, err
+	}
 	return output, nil
 }
 
 //GetRestaurantMeals returns all the meals a restaurant with the given ID offers
-func (store SQLStore) GetRestaurantMeals(restID int64) ([]Meal, error) {
-	var output []Meal
+func (store SQLStore) GetRestaurantMeals(restID int64) ([]*Meal, error) {
+	var output []*Meal
 	inq := "select * from Meals where RestaurantID=?"
 	rows, err := store.db.QueryContext(context.Background(), inq, restID)
 	if err != nil {
@@ -363,7 +377,7 @@ func (store SQLStore) GetRestaurantMeals(restID int64) ([]Meal, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisMeal Meal
+		var thisMeal *Meal
 		if err := rows.Scan(&thisMeal.ID, &thisMeal.Name, &thisMeal.Descr, &thisMeal.Calories,
 			&thisMeal.RestaurantID, &thisMeal.MealTypeID); err != nil {
 			return nil, err
