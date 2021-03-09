@@ -72,6 +72,7 @@ create table Meal (
     MealName varchar(80) NOT NULL,
     MealDescr varchar(255) NOT NULL,
     MealCal int NOT NULL,
+    MealPrice numeric(4,2) NOT NULL,
     MealImg nvarchar(500),
     RestaurantID int foreign key references Restaurant(RestaurantID),
     MealTypeID int foreign key references MealType(MealTypeID)

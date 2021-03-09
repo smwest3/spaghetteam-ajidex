@@ -34,6 +34,7 @@ type MenuItem struct {
 	Descr       string   `json:"descr"`
 	Ingredients []string `json:"ingredients"`
 	Calories    int      `json:"calories"`
+	Price       string   `json:"price"`
 	Textures    []string `json:"textures"`
 	Diets       []string `json:"diets"`
 	Img         string   `json:"img"`
@@ -95,6 +96,7 @@ type Meal struct {
 	Name         string `json:"name"`
 	Descr        string `json:"descr"`
 	Calories     int    `json:"calories"`
+	Price        string `json:"price"`
 	Img          string `json:"img"`
 	RestaurantID int64  `json:"restaurantid"`
 	MealTypeID   int64  `json:"mealtypeid"`
@@ -254,7 +256,11 @@ func (store SQLStore) GetMenuItems(restID int64) (map[string][]*MenuItem, error)
 func (store SQLStore) MealtoMenuItem(baseMeal *Meal) (*MenuItem, error) {
 	var output *MenuItem
 	var subErr error
-	output.Name, output.Descr, output.Calories, output.Img = baseMeal.Name, baseMeal.Descr, baseMeal.Calories, baseMeal.Img
+	output.Name = baseMeal.Name
+	output.Descr = baseMeal.Descr
+	output.Calories = baseMeal.Calories
+	output.Price = baseMeal.Price
+	output.Img = baseMeal.Img
 	output.Ingredients, subErr = store.GetMealIngredients(baseMeal.ID)
 	if subErr != nil {
 		return nil, subErr
@@ -378,8 +384,8 @@ func (store SQLStore) GetRestaurantMeals(restID int64) ([]*Meal, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var thisMeal *Meal
-		if err := rows.Scan(&thisMeal.ID, &thisMeal.Name, &thisMeal.Descr, &thisMeal.Calories,
-			&thisMeal.RestaurantID, &thisMeal.MealTypeID); err != nil {
+		if err := rows.Scan(&thisMeal.ID, &thisMeal.Name, &thisMeal.Descr, &thisMeal.Calories, &thisMeal.Price,
+			&thisMeal.Img, &thisMeal.RestaurantID, &thisMeal.MealTypeID); err != nil {
 			return nil, err
 		}
 		output = append(output, thisMeal)
