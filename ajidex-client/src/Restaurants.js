@@ -9,6 +9,7 @@ import {
   Redirect,
   useRouteMatch
 } from "react-router-dom";
+import api from `./APIEndpoints`;
 
 //Use as base
 const testRest = {

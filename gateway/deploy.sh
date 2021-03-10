@@ -12,6 +12,7 @@ sudo docker run -d \
 -e SESSIONKEY="testSession" \
 -e REDISADDR="redisServer:6379" \
 -e RESTAURANTADDR="restaurants:5300" \
+-e DSN="sqlserver://sa:c0d3-aj1d3x@localhost:1433"
 -p 443:443 \
 --name ajigateway \
 smwest3/ajigateway:latest

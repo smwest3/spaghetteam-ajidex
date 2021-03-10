@@ -4,7 +4,9 @@ export default {
     handlers: {
         myprofile: "/profile/me",
         session: "/session",
-        mysession: "/session/me"
+        mysession: "/session/me",
+        restaurants: "/restaurants",
+        aRestaurant: "/restaurant/"
         /*Future endpoints:
             -Diet
             -Restaurant
