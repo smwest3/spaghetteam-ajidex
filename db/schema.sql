@@ -107,3 +107,46 @@ create table RestaurantCategories (
     RestaurantCategoryID int foreign key references RestaurantCategory(RestaurantCategoryID),
     RestaurantID int foreign key References Restaurant(RestaurantID)
 );
+
+
+/*Sprocs*/
+
+create procedure getTextureID
+@TextyName varchar(80),
+@TextyDescr varchar(255),
+@TextyID int output
+
+as
+set @TextyID = (select TextureID
+		from Texture T
+		where T.TextureName = @TextyName
+		and T.TextureDescr = @TextyDescr
+		)
+
+create procedure uspPopRestaurantTexture
+@TName varchar(80),
+@TDescr varchar(255),
+
+as
+declare @TextyID2 int
+
+exec getTextureID
+@TextyName = @TName
+@TextyDescr = @TDescr
+@TextyID = @TextyID2 output
+
+if @TextyID2 is null
+	begin
+		raiserror('@TextyID2 cant be null, dudes', 1,1)
+		return
+	end
+
+begin tran t1
+insert into Texture(TextureID)
+values(@TextyID2)
+if @@error <> 0
+	begin
+		rollback tran t1
+	end
+else
+	commit tran t1
