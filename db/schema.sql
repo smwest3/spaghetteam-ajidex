@@ -113,6 +113,7 @@ create table RestaurantCategories (
 /*Sprocs*/
 
 --this is the more complicated one that i honestly don't think i need? like how does this differ from the one below, conceptually/in practice vv
+/*
 create procedure getTextureID
 @TextyName varchar(80),
 @TextyDescr varchar(255),
@@ -257,7 +258,7 @@ IF @@ERROR <> 0
 		ROLLBACK TRAN N3
 	END
 ELSE
-COMMIT TRANSACTION N3
+COMMIT TRANSACTION N3 */
 
 
 

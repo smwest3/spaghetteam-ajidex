@@ -56,6 +56,63 @@ const testRest = {
   ]
 }
 
+//state to keep track of restaurants returned
+this.state={
+  restaurants: [],
+  specRestaurant: {},
+  error: ''
+}
+
+//sets state error to returned error text
+setError = (error) => {
+  this.setState({ error })
+}
+
+//sends GET request to API to retrieve list of all restaurants
+sendRestaurantRequest = async(e) => {
+  const response = await fetch(api.base + api.handlers.restaurants, {
+    method: "GET"
+  });
+  if (response.status >= 300) {
+    const error = await response.text();
+    this.setError(error);
+    return
+  }
+  const restaurantList = await response.json();
+  this.setState({
+    restaurants: restaurantList.map(restaurant => ({
+      id: restaurant.id,
+      name: restaurant.name,
+      address: restaurant.address,
+      city: restaurant.city,
+      state: restaurant.state,
+      zip: restaurant.zip,
+      img: restaurant.img,
+      menu: restaurant.menu
+    }))
+  })
+}
+
+//current workaround for spec restaurant caller, sets specific restaurant in state to one with given id from array
+specRestaurantSetter = (restId) => {
+  this.setState({ specRestaurant: this.state.restaurants[restId]})
+}
+
+//sends GET request to API to retrieve specific a restaurant with given id 
+//incomplete, may not finish
+/*
+sendSpecRestaurantRequest = async(e, restId) => {
+  const response = await fetch(api.base + api.handlers.restaurants, {
+    method: "GET"
+  });
+  if (response.status >= 300) {
+    const error = await response.text();
+    this.setError(error);
+    return
+  }
+  const restaurant = await response.json();
+}*/
+
 function Restaurants(props) {
 
   let { path, url } = useRouteMatch();
@@ -74,11 +131,11 @@ function Restaurants(props) {
 }
 
 
+
 function Restaurant(props) {
 
     let { restId } = useParams();
-
-    // query the backend to get the rest of the info
+    
     if (restId != testRest.Url) { return(<Redirect to="/restaurants" />) }
 
     let menu = testRest.Menu.map((cat) => {

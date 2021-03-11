@@ -43,7 +43,7 @@ func (ctx *HandlerContext) SpecificRestaurantHandler(w http.ResponseWriter, r *h
 		restaurantResult, err := ctx.Store.GetRestaurantByID(restID)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				ctx.RestaurantHandler(w, r)
+				http.Error(w, fmt.Sprint("Restaurant not found"), http.StatusNotFound)
 			} else {
 				http.Error(w, fmt.Sprintf("Error retrieving restaurant: %v", err), http.StatusInternalServerError)
 				return
