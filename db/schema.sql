@@ -107,3 +107,4 @@ create table RestaurantCategories (
     RestaurantCategoryID int foreign key references RestaurantCategory(RestaurantCategoryID),
     RestaurantID int foreign key References Restaurant(RestaurantID)
 );
+
