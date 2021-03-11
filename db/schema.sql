@@ -108,9 +108,11 @@ create table RestaurantCategories (
     RestaurantID int foreign key References Restaurant(RestaurantID)
 );
 
+--EVERYTHING BELOW THIS LINE R MY ADDITIONS TO THE CODE
 
 /*Sprocs*/
 
+--this is the more complicated one that i honestly don't think i need? like how does this differ from the one below, conceptually/in practice vv
 create procedure getTextureID
 @TextyName varchar(80),
 @TextyDescr varchar(255),
@@ -150,3 +152,115 @@ if @@error <> 0
 	end
 else
 	commit tran t1
+
+
+
+	--this is the more simple one: 
+
+CREATE PROCEDURE uspPopTexture
+@TextName varchar(80),
+@TextDescr varchar(255)
+
+AS
+IF @TextName IS NULL
+		BEGIN
+			PRINT '@TextName  cannot be NULL, please give it a value.'
+			RAISERROR ('@TextName cannot be NULL; check spelling', 11,1)
+			RETURN
+		END
+
+IF @TextDescr IS NULL
+		BEGIN
+			PRINT '@TextDescr  cannot be NULL, please give it a value.'
+			RAISERROR ('@TextDescr cannot be NULL; check spelling', 11,1)
+			RETURN
+		END
+
+BEGIN TRANSACTION N2
+INSERT INTO Texture(TextureName, TextureDescr)
+VALUES (@TextName, @TextDescr)
+IF @@ERROR <> 0
+	BEGIN
+		PRINT 'TRAN N2 is terminating due to an error. Good luck debugging!'
+		ROLLBACK TRAN N2
+	END
+ELSE
+COMMIT TRANSACTION N2
+
+
+
+
+
+--sproc for adding allergens
+CREATE PROCEDURE uspPopAllergens
+@AllName varchar(80),
+@AllDescr varchar(255)
+
+AS
+IF @AllName IS NULL
+		BEGIN
+			PRINT '@AllName  cannot be NULL, please give it a value.'
+			RAISERROR ('@AllName cannot be NULL; check spelling', 11,1)
+			RETURN
+		END
+
+IF @AllDescr IS NULL
+		BEGIN
+			PRINT '@AllDescr  cannot be NULL, please give it a value.'
+			RAISERROR ('@AllDescr cannot be NULL; check spelling', 11,1)
+			RETURN
+		END
+
+BEGIN TRANSACTION N3
+INSERT INTO Allergen(AllergenName, AllergenDescription)
+VALUES (@AllName, @AllDescr)
+IF @@ERROR <> 0
+	BEGIN
+		PRINT 'TRAN N3 is terminating due to an error. Good luck debugging!'
+		ROLLBACK TRAN N3
+	END
+ELSE
+COMMIT TRANSACTION N3
+
+
+
+
+
+
+--sproc for adding a new category (general)
+
+CREATE PROCEDURE uspPopCategory
+@AllName varchar(80),
+@AllDescr varchar(255)
+
+AS
+IF @AllName IS NULL
+		BEGIN
+			PRINT '@AllName  cannot be NULL, please give it a value.'
+			RAISERROR ('@AllName cannot be NULL; check spelling', 11,1)
+			RETURN
+		END
+
+IF @AllDescr IS NULL
+		BEGIN
+			PRINT '@AllDescr  cannot be NULL, please give it a value.'
+			RAISERROR ('@AllDescr cannot be NULL; check spelling', 11,1)
+			RETURN
+		END
+
+BEGIN TRANSACTION N3
+INSERT INTO Allergen(AllergenName, AllergenDescription)
+VALUES (@AllName, @AllDescr)
+IF @@ERROR <> 0
+	BEGIN
+		PRINT 'TRAN N3 is terminating due to an error. Good luck debugging!'
+		ROLLBACK TRAN N3
+	END
+ELSE
+COMMIT TRANSACTION N3
+
+
+
+
+
+
