@@ -1,4 +1,4 @@
 FROM alpine
-COPY restaurants /restaurants
+COPY . /restaurants
 EXPOSE 5300
 ENTRYPOINT [ "/restaurants" ]

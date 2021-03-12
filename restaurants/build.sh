@@ -1,9 +1,7 @@
 GOOS=linux go build
 
-docker build -t smwest3/ajirestaurants .
+docker build -t smwest3/restaurants .
 
 go clean
 
-docker push smwest3/ajirestaurants
-
-ssh smwest3@ajidex.capstone.ischool.uw.edu < deploy.sh
+docker push smwest3/restaurants

@@ -56,6 +56,8 @@ const testRest = {
   ]
 }
 
+/*
+COMMENTED OUT, WILL CLEAN UP LATER
 //state to keep track of restaurants returned
 this.state={
   restaurants: [],
@@ -97,6 +99,7 @@ sendRestaurantRequest = async(e) => {
 specRestaurantSetter = (restId) => {
   this.setState({ specRestaurant: this.state.restaurants[restId]})
 }
+*/
 
 //sends GET request to API to retrieve specific a restaurant with given id 
 //incomplete, may not finish
