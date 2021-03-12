@@ -108,6 +108,20 @@ create table RestaurantCategories (
     RestaurantID int foreign key References Restaurant(RestaurantID)
 );
 
+insert into MealType(MealTypeName) values ("Appetizers"), ("Beverages");
+
+insert into Texture(TextureName, TextyDescr) values ("Fibrous", "Fibrous descr"), 
+("Spongy", "like you're eating a sponge"), ("Tangy", "Tang-tang"), ("Smooth", "good stuff"), 
+("like jazz", "self explanatory");
+
+insert into Restaurant values ("Paddy's Pub", "1234 Always Sunny St", "Philadelphia", "PA", "42069", "https://i.reddituploads.com/82435827a2e44f7aa2c2782dd20e4ba6?fit=max&h=1536&w=1536&s=d0407d4a63a463e45ee60ddc83f62764");
+
+insert into Meal values ("Sweet Potato Salad", "A sweet potato salad with only the finest leafy lettuce and thick cut sweet potatoes. Our chef's finest creation in the world. Honestly idk how he does it.",
+400, 5.20, "./img/potato_salad_template.jpg", 1, 1), ("Taco Salad", "A salad made of tacos", 450, 4.20, "https://bigoven-res.cloudinary.com/image/upload/d_recipe-no-image.jpg,t_recipe-256/spicy-dorito-taco-salad-23aed0.jpg", 1, 1), 
+("Pork Soda", "Easy on the tongue", 200, 1.20, "https://ih1.redbubble.net/image.418980247.7118/flat,128x128,075,t-pad,128x128,f8f8f8.u3.jpg", 1, 2);
+
+
+
 --EVERYTHING BELOW THIS LINE R MY ADDITIONS TO THE CODE
 
 /*Sprocs*/
