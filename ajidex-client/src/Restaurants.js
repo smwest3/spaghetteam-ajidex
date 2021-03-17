@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MenuItem from './MenuItem.js';
 import Salad from './img/potato_salad_template.jpg';
 import Image from 'react-bootstrap/Image';
@@ -56,28 +56,21 @@ const testRest = {
   ]
 }
 
-/*
-COMMENTED OUT, WILL CLEAN UP LATER
 //state to keep track of restaurants returned
 this.state={
   restaurants: [],
   specRestaurant: {},
-  error: ''
-}
-
-//sets state error to returned error text
-setError = (error) => {
-  this.setState({ error })
+  error: ""
 }
 
 //sends GET request to API to retrieve list of all restaurants
-sendRestaurantRequest = async(e) => {
+async function sendRestaurantRequest(){
   const response = await fetch(api.base + api.handlers.restaurants, {
     method: "GET"
   });
   if (response.status >= 300) {
     const error = await response.text();
-    this.setError(error);
+    this.setState({ error })
     return
   }
   const restaurantList = await response.json();
@@ -96,10 +89,14 @@ sendRestaurantRequest = async(e) => {
 }
 
 //current workaround for spec restaurant caller, sets specific restaurant in state to one with given id from array
-specRestaurantSetter = (restId) => {
-  this.setState({ specRestaurant: this.state.restaurants[restId]})
+function specRestaurantSetter(restId) {
+  if (restId < this.state.restaurants.length) {
+    this.setState({ specRestaurant: this.state.restaurants[restId]})
+  } else {
+    this.setState({ error: "Restaurant not found" })
+  }
 }
-*/
+
 
 //sends GET request to API to retrieve specific a restaurant with given id 
 //incomplete, may not finish
@@ -119,7 +116,7 @@ sendSpecRestaurantRequest = async(e, restId) => {
 function Restaurants(props) {
 
   let { path, url } = useRouteMatch();
-
+  sendRestaurantRequest();
   return(
     <Switch>
       <Route exact path={path}>
@@ -138,8 +135,10 @@ function Restaurants(props) {
 function Restaurant(props) {
 
     let { restId } = useParams();
-    
-    if (restId != testRest.Url) { return(<Redirect to="/restaurants" />) }
+    specRestaurantSetter(restId);
+    let errMessage = this.state.error
+    if (errMessage == "Restaurant not found" || restId >= this.state.restaurants.length) 
+      { return(<Redirect to="/restaurants" />) }
 
     let menu = testRest.Menu.map((cat) => {
       return (<div key={cat.Category}><h2>{cat.Category}</h2> {

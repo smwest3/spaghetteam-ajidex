@@ -13,7 +13,7 @@ sudo docker run -d \
 -e REDISADDR="redisServer:6379" \
 -e RESTAURANTADDR="restaurants:5300" \
 -e DSN="sqlserver://sa:C0d3-aj1d3x@172.18.0.2:1433?database=ajidexdb&connectiontimeout=0" \
--p 443:443 \
+-p 5000:5000 \
 --name ajigateway \
 smwest3/ajigateway:latest
 

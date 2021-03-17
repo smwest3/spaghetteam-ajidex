@@ -1,5 +1,5 @@
 export default {
-    base: "https://api.ajidex.capstone.ischool.uw.edu/",
+    base: "https://ajidex.capstone.ischool.uw.edu/api/",
     testbase: "https://localhost:4000",
     handlers: {
         myprofile: "/profile/me",
