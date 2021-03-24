@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import MenuItem from './MenuItem.js';
 import Salad from './img/potato_salad_template.jpg';
 import Image from 'react-bootstrap/Image';
+import Form from 'react-bootstrap/Form';
+import FormControl from 'react-bootstrap/FormControl';
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
 import {
   Switch,
   Route,
@@ -24,6 +29,7 @@ const testRest = {
         {
           Name: "Sweet Potato Salad",
           Description: "A sweet potato salad with only the finest leafy lettuce and thick cut sweet potatoes. Our chef's finest creation in the world. Honestly idk how he does it.",
+          Price: "$12.33",
           Ingredients: ["Sweet Potato", "Lettuce"],
           Calories: 400,
           Textures: ["Fibrous", "Spongy"],
@@ -32,6 +38,7 @@ const testRest = {
         }, {
           Name: "Taco Salad",
           Description: "A salad made of tacos",
+          Price: "$10.99",
           Ingredients: ["Tortilla", "Flour", "Salsa", "Tomato"],
           Calories: 450,
           Textures: ["Tangy", "Spongy"],
@@ -45,6 +52,7 @@ const testRest = {
         {
           Name: "Pork Soda",
           Description: "Easy on the tongue",
+          Price: "$7.00",
           Ingredients: ["Pork", "Sugar"],
           Calories: 200,
           Textures: ["Smooth, like jazz"],
@@ -56,12 +64,13 @@ const testRest = {
   ]
 }
 
+/*
 //state to keep track of restaurants returned
 this.state={
   restaurants: [],
   specRestaurant: {},
   error: ""
-}
+}*/
 
 //sends GET request to API to retrieve list of all restaurants
 async function sendRestaurantRequest(){
@@ -98,7 +107,7 @@ function specRestaurantSetter(restId) {
 }
 
 
-//sends GET request to API to retrieve specific a restaurant with given id 
+//sends GET request to API to retrieve specific a restaurant with given id
 //incomplete, may not finish
 /*
 sendSpecRestaurantRequest = async(e, restId) => {
@@ -116,11 +125,11 @@ sendSpecRestaurantRequest = async(e, restId) => {
 function Restaurants(props) {
 
   let { path, url } = useRouteMatch();
-  sendRestaurantRequest();
+  //sendRestaurantRequest();
   return(
     <Switch>
       <Route exact path={path}>
-        <h3>Search from this list of restaurants!</h3>
+        <RestaurantSearch />
       </Route>
       <Route path={`${path}/:restId`}>
           <Restaurant />
@@ -130,20 +139,36 @@ function Restaurants(props) {
   );
 }
 
-
+function RestaurantSearch(props) {
+  return(
+    <Container>
+      <Form>
+      <Form.Row>
+      <Col>
+        <FormControl type="text" placeholder="Find a Restaurant"/>
+      </Col>
+      <Col>
+        <Button className="searchbtn">Search</Button>
+      </Col>
+      </Form.Row>
+      </Form>
+    </Container>
+  );
+}
 
 function Restaurant(props) {
 
     let { restId } = useParams();
-    specRestaurantSetter(restId);
-    let errMessage = this.state.error
-    if (errMessage == "Restaurant not found" || restId >= this.state.restaurants.length) 
-      { return(<Redirect to="/restaurants" />) }
 
+    /*specRestaurantSetter(restId);
+    let errMessage = this.state.error
+    if (errMessage == "Restaurant not found" || restId >= this.state.restaurants.length)
+      { return(<Redirect to="/restaurants" />) }
+    */
     let menu = testRest.Menu.map((cat) => {
       return (<div key={cat.Category}><h2>{cat.Category}</h2> {
         cat.Items.map((item) => {
-          return(<MenuItem key={item.Name} Name={item.Name} Description={item.Description} Ingredients={item.Ingredients} Calories={item.Calories} Textures={item.Textures} Diets={item.Diets} Image={item.Image}/>);
+          return(<MenuItem key={item.Name} Name={item.Name} Description={item.Description} Price={item.Price} Ingredients={item.Ingredients} Calories={item.Calories} Textures={item.Textures} Diets={item.Diets} Image={item.Image}/>);
         })
       }</div>);
     });

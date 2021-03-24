@@ -23,7 +23,7 @@ function MenuItem(props) {
   ));
 
   return (
-    <Media className="menuitem">
+    /*<Media className="menuitem">
       <Media.Body>
         <h5>{props.Name}</h5>
         <p>
@@ -41,7 +41,32 @@ function MenuItem(props) {
         src={props.Image}
         alt="Generic placeholder"
       />
-    </Media>
+  </Media>*/
+  <Container fluid className="menuitem">
+    <Row>
+      <Col>
+        <h5>{props.Name}</h5>
+        <h6>{props.Price}</h6>
+        <p>
+          {props.Description}
+          <br />
+          <Badge className="menutag" variant="danger">{props.Calories} cal</Badge>
+          {tex}
+          {diet}
+        </p>
+      </Col>
+      <Col xs="auto">
+        <Image
+          width={128}
+          rounded
+          fluid
+          src={props.Image}
+          alt="Generic placeholder"
+        />
+      </Col>
+    </Row>
+  </Container>
+
   );
 }
 
