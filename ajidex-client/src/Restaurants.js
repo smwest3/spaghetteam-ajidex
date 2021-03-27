@@ -155,8 +155,9 @@ function RestaurantSearch(props) {
     let restItems = restaurants.map((item) => {
       return (
         <RestItem
-          key={item.Name}
+          key={item.Url}
           Name={item.Name}
+          Url={item.Url}
           Image={item.Image}
           Address={item.Address}
           Description={item.Description}
