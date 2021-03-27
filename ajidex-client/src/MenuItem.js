@@ -4,7 +4,6 @@ import Badge from 'react-bootstrap/Badge';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Media from 'react-bootstrap/Media';
 import Image from 'react-bootstrap/Image';
 
 
@@ -23,25 +22,6 @@ function MenuItem(props) {
   ));
 
   return (
-    /*<Media className="menuitem">
-      <Media.Body>
-        <h5>{props.Name}</h5>
-        <p>
-          {props.Description}
-          <br />
-          <Badge className="menutag" variant="danger">{props.Calories} cal</Badge>
-          {tex}
-          {diet}
-        </p>
-      </Media.Body>
-      <Image
-        width={128}
-        rounded
-        fluid
-        src={props.Image}
-        alt="Generic placeholder"
-      />
-  </Media>*/
   <Container fluid className="menuitem">
     <Row>
       <Col>

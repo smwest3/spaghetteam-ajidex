@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import MenuItem from './MenuItem.js';
+import RestItem from './RestItem.js';
 import Salad from './img/potato_salad_template.jpg';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
@@ -16,12 +17,13 @@ import {
 } from "react-router-dom";
 import api from './APIEndpoints';
 
-//Use as base
+// Use as base
 const testRest = {
   Name: "Paddy's Pub",
   Image: "https://i.reddituploads.com/82435827a2e44f7aa2c2782dd20e4ba6?fit=max&h=1536&w=1536&s=d0407d4a63a463e45ee60ddc83f62764",
   Url: "paddys-pub",
-  Address: "",
+  Address: "3rd & Dickinson",
+  Description: "A trendy bar in southern Philly",
   Menu: [
     {
       Category: "Appetizers",
@@ -122,9 +124,10 @@ sendSpecRestaurantRequest = async(e, restId) => {
   const restaurant = await response.json();
 }*/
 
+// Decides which to show: specific restaurants or the search page
 function Restaurants(props) {
-
   let { path, url } = useRouteMatch();
+
   //sendRestaurantRequest();
   return(
     <Switch>
@@ -139,33 +142,89 @@ function Restaurants(props) {
   );
 }
 
+// Shows the search page based on whatever the user searches
 function RestaurantSearch(props) {
-  return(
-    <Container>
-      <Form>
-      <Form.Row>
-      <Col>
-        <FormControl type="text" placeholder="Find a Restaurant"/>
-      </Col>
-      <Col>
-        <Button className="searchbtn">Search</Button>
-      </Col>
-      </Form.Row>
-      </Form>
-    </Container>
-  );
+  const [query, setQuery] = useState();
+
+  const { search } = window.location;
+  const terms = new URLSearchParams(search).get('rest');
+
+  if (terms != null && terms != "") {
+    let restaurants = getSearchRests(terms);
+
+    let restItems = restaurants.map((item) => {
+      return (
+        <RestItem
+          key={item.Name}
+          Name={item.Name}
+          Image={item.Image}
+          Address={item.Address}
+          Description={item.Description}
+        />
+      );
+    });
+    return(
+      <div>
+        <Form action="/restaurants/" method="get" autoComplete="off">
+          <Form.Row>
+            <Col>
+              <FormControl type="text" value={query} onInput={(e) => setQuery(e.target.value)} id="rest-search" name="rest" placeholder="Find a Restaurant"/>
+            </Col>
+            <Col>
+              <Button className="searchbtn" type="submit">Search</Button>
+            </Col>
+          </Form.Row>
+        </Form>
+        <div>
+          {restItems}
+        </div>
+      </div>
+    );
+  } else {
+    return(
+      <div>
+        <Form action="/restaurants/" method="get" autoComplete="off">
+          <Form.Row>
+            <Col>
+              <FormControl type="text" value={query} onInput={(e) => setQuery(e.target.value)} id="rest-search" name="rest" placeholder="Find a Restaurant"/>
+            </Col>
+            <Col>
+              <Button className="searchbtn" type="submit">Search</Button>
+            </Col>
+          </Form.Row>
+        </Form>
+        <div>
+          <p>Discover your favorite restaurants on this page!</p>
+        </div>
+      </div>
+    );
+  }
 }
 
-function Restaurant(props) {
+// Queries the API and compiles a list of relevant restaurants based on the search terms
+function getSearchRests(searchTerms) {
 
+  // sanatize the search terms.
+
+  // ping the api for restaurants with a matching name
+
+  // returns the list
+  return [testRest];
+}
+
+
+// Shows the page for a specific restaurant
+function Restaurant(props) {
     let { restId } = useParams();
 
-    /*specRestaurantSetter(restId);
-    let errMessage = this.state.error
-    if (errMessage == "Restaurant not found" || restId >= this.state.restaurants.length)
-      { return(<Redirect to="/restaurants" />) }
-    */
-    let menu = testRest.Menu.map((cat) => {
+    //let rest = sendSpecRestaurantRequest(restId);
+    if (restId != "paddys-pub") {
+      return (<Redirect to="/Restaurants/"/>);
+    }
+
+    let rest = testRest;
+
+    let menu = rest.Menu.map((cat) => {
       return (<div key={cat.Category}><h2>{cat.Category}</h2> {
         cat.Items.map((item) => {
           return(<MenuItem key={item.Name} Name={item.Name} Description={item.Description} Price={item.Price} Ingredients={item.Ingredients} Calories={item.Calories} Textures={item.Textures} Diets={item.Diets} Image={item.Image}/>);
@@ -176,12 +235,12 @@ function Restaurant(props) {
   return (
     <div>
       <div className="menutitle">
-        <h1>{testRest.Name}</h1>
+        <h1>{rest.Name}</h1>
           <Image
             width={400}
             rounded
             fluid
-            src={testRest.Image}
+            src={rest.Image}
             alt="A restaurant image"
           />
       </div>

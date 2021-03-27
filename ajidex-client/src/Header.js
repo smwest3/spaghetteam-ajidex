@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
@@ -9,6 +9,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 //Creates header
 export function Header(props) {
+  const [query, setQuery] = useState();
   return (
     <div>
     <Navbar className="nav" fixed="top" expand="lg" variant="dark">
@@ -20,9 +21,9 @@ export function Header(props) {
           <LinkContainer to="/about"><Nav.Link>About</Nav.Link></LinkContainer>
           <LinkContainer to="/contact"><Nav.Link>Contact</Nav.Link></LinkContainer>
         </Nav>
-        <Form inline>
-          <FormControl type="text" placeholder="Find a Restaurant" className="mr-sm-2" />
-          <Button className="searchbtn" variant="outline-light">Search</Button>
+        <Form action="/restaurants/" method="get" autoComplete="off" inline>
+          <FormControl type="text" value={query} onInput={(e) => setQuery(e.target.value)} className="mr-sm-2" id="header-rest-search" name="rest" placeholder="Find a Restaurant"/>
+          <Button className="searchbtn" type="submit" variant="outline-light">Search</Button>
         </Form>
         <Nav>
           <NavDropdown alignRight title="Profile" id="basic-nav-dropdown">
