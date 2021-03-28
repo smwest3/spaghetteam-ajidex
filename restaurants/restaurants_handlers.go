@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"path"
-	"strconv"
 )
 
 //RestaurantHandler handles requests to the /restaurants endpoint
@@ -36,11 +35,9 @@ func (ctx *HandlerContext) RestaurantHandler(w http.ResponseWriter, r *http.Requ
 //SpecificRestaurantHandler handles requests to the /restaurants/ endpoint
 func (ctx *HandlerContext) SpecificRestaurantHandler(w http.ResponseWriter, r *http.Request) {
 	urlBase := path.Base(r.URL.String())
-	idBase, _ := strconv.Atoi(urlBase)
-	restID := int64(idBase)
 	switch r.Method {
 	case http.MethodGet:
-		restaurantResult, err := ctx.Store.GetRestaurantByID(restID)
+		restaurantResult, err := ctx.Store.GetRestaurantByURL(urlBase)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				http.Error(w, fmt.Sprint("Restaurant not found"), http.StatusNotFound)
@@ -55,5 +52,8 @@ func (ctx *HandlerContext) SpecificRestaurantHandler(w http.ResponseWriter, r *h
 			http.Error(w, fmt.Sprintf("Error encoding JSON: %v", err), http.StatusInternalServerError)
 			return
 		}
+	default:
+		http.Error(w, "Method not supported", http.StatusMethodNotAllowed)
+		return
 	}
 }

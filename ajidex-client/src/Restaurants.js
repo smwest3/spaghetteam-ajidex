@@ -66,13 +66,12 @@ const testRest = {
   ]
 }
 
-/*
 //state to keep track of restaurants returned
-this.state={
+var state={
   restaurants: [],
   specRestaurant: {},
-  error: ""
-}*/
+  error: ''
+}
 
 //sends GET request to API to retrieve list of all restaurants
 async function sendRestaurantRequest(){
@@ -81,12 +80,11 @@ async function sendRestaurantRequest(){
   });
   if (response.status >= 300) {
     const error = await response.text();
-    this.setState({ error })
+    state.error = error;
     return
   }
   const restaurantList = await response.json();
-  this.setState({
-    restaurants: restaurantList.map(restaurant => ({
+    state.restaurants = restaurantList.map(restaurant => ({
       id: restaurant.id,
       name: restaurant.name,
       address: restaurant.address,
@@ -94,35 +92,37 @@ async function sendRestaurantRequest(){
       state: restaurant.state,
       zip: restaurant.zip,
       img: restaurant.img,
+      url: restaurant.url,
       menu: restaurant.menu
     }))
-  })
 }
 
 //current workaround for spec restaurant caller, sets specific restaurant in state to one with given id from array
-function specRestaurantSetter(restId) {
-  if (restId < this.state.restaurants.length) {
-    this.setState({ specRestaurant: this.state.restaurants[restId]})
+function specRestaurantSetter(restURL) {
+  var specRest = this.state.restaurants.find(restaurant => {
+    return restaurant.url === restURL
+  })
+  if (typeof specRest == "undefined") {
+    state.error = "Restaurant not found"
   } else {
-    this.setState({ error: "Restaurant not found" })
+    state.specRestaurant = specRest
   }
 }
 
 
-//sends GET request to API to retrieve specific a restaurant with given id
-//incomplete, may not finish
-/*
-sendSpecRestaurantRequest = async(e, restId) => {
-  const response = await fetch(api.base + api.handlers.restaurants, {
+//sends GET request to API to retrieve specific a restaurant with given URL
+async function sendSpecRestaurantRequest(restURL) {
+  const response = await fetch(api.base + api.handlers.restaurants + restURL, {
     method: "GET"
   });
   if (response.status >= 300) {
     const error = await response.text();
-    this.setError(error);
+    state.error = error;
     return
   }
   const restaurant = await response.json();
-}*/
+  state.specRestaurant = JSON.parse(JSON.stringify(restaurant))
+}
 
 // Decides which to show: specific restaurants or the search page
 function Restaurants(props) {

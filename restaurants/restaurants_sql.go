@@ -60,6 +60,7 @@ type Restaurant struct {
 	State   string `json:"state"`
 	Zip     int    `json:"zip"`
 	Img     string `json:"img"`
+	Url     string `json:"url"`
 	Menu    *Menu  `json:"menu"`
 }
 
@@ -114,7 +115,7 @@ func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]*Restaurant, error)
 	for rows.Next() {
 		var thisRestaurant *Restaurant
 		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 			return nil, err
 		}
 		thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
@@ -142,7 +143,7 @@ func (store SQLStore) GetAllRestaurants() ([]*Restaurant, error) {
 	for rows.Next() {
 		var thisRestaurant *Restaurant
 		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 			return nil, err
 		}
 		thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
@@ -171,7 +172,7 @@ func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error
 	for rows.Next() {
 		var thisRestaurant *Restaurant
 		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 			return nil, err
 		}
 		//future consideration: GIS capabilities
@@ -189,14 +190,14 @@ func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error
 
 //GetRestaurantByID returns all restaurants with given name
 // **NOTE: may rewrite so it only returns one row
-func (store SQLStore) GetRestaurantByID(restID int64) (*Restaurant, error) {
+func (store SQLStore) GetRestaurantByURL(restURL string) (*Restaurant, error) {
 	var output *Restaurant
 	var err error
-	inq := "select * from Restaurants where RestaurantID=?"
-	row := store.db.QueryRowContext(context.Background(), inq, restID)
+	inq := "select * from Restaurants where RestaurantURL=?"
+	row := store.db.QueryRowContext(context.Background(), inq, restURL)
 	var thisRestaurant *Restaurant
 	if err := row.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-		&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img); err != nil {
+		&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 		return thisRestaurant, err
 	}
 	thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)

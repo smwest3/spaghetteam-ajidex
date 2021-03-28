@@ -58,7 +58,8 @@ create table Restaurant (
     RestaurantCity varchar(80) NOT NULL,
     RestaurantState varchar(20) NOT NULL,
     RestaurantZip int NOT NULL,
-    RestaurantImg nvarchar(500)
+    RestaurantImg nvarchar(500),
+    RestaurantURL varchar(100) NOT NULL
     /*RestaurantWiFi, [type] NOT NULL*/
 )
 GO
@@ -114,7 +115,7 @@ insert into Texture(TextureName, TextureDescr) values ("Fibrous", "Fibrous descr
 ("Spongy", "like you're eating a sponge"), ("Tangy", "Tang-tang"), ("Smooth", "good stuff"), 
 ("like jazz", "self explanatory");
 GO
-insert into Restaurant values ("Paddy's Pub", "1234 Always Sunny St", "Philadelphia", "PA", "42069", "https://i.reddituploads.com/82435827a2e44f7aa2c2782dd20e4ba6?fit=max&h=1536&w=1536&s=d0407d4a63a463e45ee60ddc83f62764");
+insert into Restaurant values ("Paddy's Pub", "1234 Always Sunny St", "Philadelphia", "PA", "42069", "https://i.reddituploads.com/82435827a2e44f7aa2c2782dd20e4ba6?fit=max&h=1536&w=1536&s=d0407d4a63a463e45ee60ddc83f62764", "paddys-pub");
 GO
 insert into Meal values ("Sweet Potato Salad", "A sweet potato salad with only the finest leafy lettuce and thick cut sweet potatoes. Our chef's finest creation in the world. Honestly idk how he does it.",
 400, 5.20, "./img/potato_salad_template.jpg", 1, 1), ("Taco Salad", "A salad made of tacos", 450, 4.20, "https://bigoven-res.cloudinary.com/image/upload/d_recipe-no-image.jpg,t_recipe-256/spicy-dorito-taco-salad-23aed0.jpg", 1, 1), 
