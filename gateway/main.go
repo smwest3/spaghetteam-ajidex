@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,15 +18,9 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-// Director directs HTTPS to HTTP
-type Director func(r *http.Request)
-
-// CustomDirector creates a custom director
-func CustomDirector(c *handlers.HandlerContext, targets []*url.URL) Director {
-	var counter int32
-	counter = 0
-	return func(r *http.Request) {
-		currSession := &handlers.SessionState{}
+/*
+Save for later
+currSession := &handlers.SessionState{}
 		_, err := sessions.GetState(r, c.Key, c.SessionStore, currSession)
 		if err == nil {
 			currID := currSession.User.ID
@@ -37,7 +30,16 @@ func CustomDirector(c *handlers.HandlerContext, targets []*url.URL) Director {
 		} else {
 			r.Header.Set("X-User", "")
 		}
+*/
 
+// Director directs HTTPS to HTTP
+type Director func(r *http.Request)
+
+// CustomDirector creates a custom director
+func CustomDirector(c *handlers.HandlerContext, targets []*url.URL) Director {
+	var counter int32
+	counter = 0
+	return func(r *http.Request) {
 		targ := targets[int(counter)%len(targets)]
 		atomic.AddInt32(&counter, 1)
 		r.Header.Add("X-Forwarded-Host", r.Host)
@@ -50,7 +52,7 @@ func CustomDirector(c *handlers.HandlerContext, targets []*url.URL) Director {
 func main() {
 	addr := os.Getenv("ADDR")
 	if len(addr) == 0 {
-		addr = ":443"
+		addr = ":5000"
 	}
 
 	tlsCertPath := os.Getenv("TLSCERT")
@@ -65,7 +67,9 @@ func main() {
 
 	rStore := sessions.NewRedisStore(rdb, cache.DefaultExpiration)
 
-	db, err := sql.Open("sqlserver", dsn)
+	var db *sql.DB
+	var err error
+	db, err = sql.Open("sqlserver", dsn)
 	if err != nil {
 		fmt.Printf("error opening database: %v\n", err)
 		os.Exit(1)
@@ -95,8 +99,8 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/restaurant", restaurantProxy)
-	mux.Handle("/restaurant/", restaurantProxy)
+	mux.Handle("/restaurants", restaurantProxy)
+	mux.Handle("/restaurants/", restaurantProxy)
 	mux.HandleFunc("/profile", handlerctx.UsersHandler)
 	mux.HandleFunc("/profile/", handlerctx.SpecificUserHandler)
 	mux.HandleFunc("/sessions", handlerctx.SessionsHandler)

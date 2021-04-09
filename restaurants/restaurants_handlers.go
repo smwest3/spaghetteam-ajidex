@@ -1,4 +1,4 @@
-package restaurants
+package main
 
 import (
 	"database/sql"

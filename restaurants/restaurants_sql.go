@@ -1,4 +1,4 @@
-package restaurants
+package main
 
 import (
 	"context"
@@ -33,7 +33,7 @@ type MenuItem struct {
 	Name        string   `json:"name"`
 	Descr       string   `json:"descr"`
 	Ingredients []string `json:"ingredients"`
-	Calories    int      `json:"calories"`
+	Calories    int64    `json:"calories"`
 	Price       string   `json:"price"`
 	Textures    []string `json:"textures"`
 	Diets       []string `json:"diets"`
@@ -58,7 +58,7 @@ type Restaurant struct {
 	Address string `json:"address"`
 	City    string `json:"city"`
 	State   string `json:"state"`
-	Zip     int    `json:"zip"`
+	Zip     int64  `json:"zip"`
 	Img     string `json:"img"`
 	Url     string `json:"url"`
 	Menu    *Menu  `json:"menu"`
@@ -78,7 +78,7 @@ type NewRestaurant struct {
 	Address string `json:"address"`
 	City    string `json:"city"`
 	State   string `json:"state"`
-	Zip     int    `json:"zip"`
+	Zip     int64  `json:"zip"`
 }
 
 //NewMeal represents a meal about to be submitted
@@ -96,7 +96,7 @@ type Meal struct {
 	ID           int64  `json:"id"`
 	Name         string `json:"name"`
 	Descr        string `json:"descr"`
-	Calories     int    `json:"calories"`
+	Calories     int64  `json:"calories"`
 	Price        string `json:"price"`
 	Img          string `json:"img"`
 	RestaurantID int64  `json:"restaurantid"`
@@ -105,16 +105,19 @@ type Meal struct {
 
 //GetNearbyRestaurants returns all restaurants within the given zipcode
 func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]*Restaurant, error) {
-	var output []*Restaurant
-	inq := "select * from Restaurants where RestaurantZip=?"
-	rows, err := store.db.QueryContext(context.Background(), inq, zipcode)
+	output := []*Restaurant{}
+	inq := `select RestaurantID, RestaurantName, RestaurantAddress, RestaurantCity, 
+	RestaurantState, RestaurantZip, RestaurantImg, RestaurantURL
+	from Restaurants
+	where RestaurantZip=@RZ`
+	rows, err := store.db.QueryContext(context.Background(), inq, sql.Named("RZ", zipcode))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisRestaurant *Restaurant
-		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
+		thisRestaurant := &Restaurant{}
+		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address, &thisRestaurant.City,
 			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 			return nil, err
 		}
@@ -133,17 +136,18 @@ func (store SQLStore) GetNearbyRestaurants(zipcode int64) ([]*Restaurant, error)
 
 //GetAllRestaurants returns all restaurants within the given zipcode
 func (store SQLStore) GetAllRestaurants() ([]*Restaurant, error) {
-	var output []*Restaurant
-	inq := "select * from Restaurants"
+	output := []*Restaurant{}
+	inq := `select RestaurantID, RestaurantName, RestaurantAddress, RestaurantCity, 
+	RestaurantState, RestaurantZip, RestaurantImg, RestaurantURL
+	from Restaurants`
 	rows, err := store.db.QueryContext(context.Background(), inq)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisRestaurant *Restaurant
-		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
-			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
+		thisRestaurant := &Restaurant{}
+		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address, &thisRestaurant.City, &thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 			return nil, err
 		}
 		thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
@@ -162,16 +166,19 @@ func (store SQLStore) GetAllRestaurants() ([]*Restaurant, error) {
 //GetRestaurantByName returns all restaurants with given name
 // **NOTE: may rewrite so it only returns one row
 func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error) {
-	var output []*Restaurant
-	inq := "select * from Restaurants where RestaurantName=?"
-	rows, err := store.db.QueryContext(context.Background(), inq, restName)
+	output := []*Restaurant{}
+	inq := `select RestaurantID, RestaurantName, RestaurantAddress, RestaurantCity, 
+	RestaurantState, RestaurantZip, RestaurantImg, RestaurantURL
+	from Restaurants
+	where RestaurantName=@RN`
+	rows, err := store.db.QueryContext(context.Background(), inq, sql.Named("RN", restName))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisRestaurant *Restaurant
-		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
+		thisRestaurant := &Restaurant{}
+		if err := rows.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address, &thisRestaurant.City,
 			&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 			return nil, err
 		}
@@ -191,12 +198,14 @@ func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error
 //GetRestaurantByID returns all restaurants with given name
 // **NOTE: may rewrite so it only returns one row
 func (store SQLStore) GetRestaurantByURL(restURL string) (*Restaurant, error) {
-	var output *Restaurant
 	var err error
-	inq := "select * from Restaurants where RestaurantURL=?"
-	row := store.db.QueryRowContext(context.Background(), inq, restURL)
-	var thisRestaurant *Restaurant
-	if err := row.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address,
+	inq := `select RestaurantID, RestaurantName, RestaurantAddress, RestaurantCity, 
+	RestaurantState, RestaurantZip, RestaurantImg, RestaurantURL
+	from Restaurants
+	where RestaurantURL=@R_URL`
+	row := store.db.QueryRowContext(context.Background(), inq, sql.Named("R_URL", restURL))
+	thisRestaurant := &Restaurant{}
+	if err := row.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address, &thisRestaurant.City,
 		&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
 		return thisRestaurant, err
 	}
@@ -207,12 +216,12 @@ func (store SQLStore) GetRestaurantByURL(restURL string) (*Restaurant, error) {
 	if err := row.Err(); err != nil {
 		return nil, err
 	}
-	return output, nil
+	return thisRestaurant, nil
 }
 
 //GetRestaurantMenu returns a Menu struct with all the meals a restaurant offers by category
 func (store SQLStore) GetRestaurantMenu(restID int64) (*Menu, error) {
-	var output *Menu
+	output := &Menu{}
 	menuMap, err := store.GetMenuItems(restID)
 	if err != nil {
 		return nil, err
@@ -230,7 +239,7 @@ func (store SQLStore) GetRestaurantMenu(restID int64) (*Menu, error) {
 
 //GetMenuItems returns a map with string meal category keys and slices of MenuItems as values
 func (store SQLStore) GetMenuItems(restID int64) (map[string][]*MenuItem, error) {
-	var output map[string][]*MenuItem
+	output := make(map[string][]*MenuItem)
 	Meals, err := store.GetRestaurantMeals(restID)
 	if err != nil {
 		return nil, err
@@ -255,7 +264,7 @@ func (store SQLStore) GetMenuItems(restID int64) (map[string][]*MenuItem, error)
 
 //MealtoMenuItem converts an inputted Meal struct into a MenuItem struct
 func (store SQLStore) MealtoMenuItem(baseMeal *Meal) (*MenuItem, error) {
-	var output *MenuItem
+	output := &MenuItem{}
 	var subErr error
 	output.Name = baseMeal.Name
 	output.Descr = baseMeal.Descr
@@ -279,13 +288,13 @@ func (store SQLStore) MealtoMenuItem(baseMeal *Meal) (*MenuItem, error) {
 
 //GetMealIngredients returns the names of ingredients of the meal with the given ID in slice format
 func (store SQLStore) GetMealIngredients(mealID int64) ([]string, error) {
-	var output []string
+	output := []string{}
 	ingredInq := `select I.IngredientName 
 	from Ingredients I
 	join MealIngredient MI on MI.IngredientID=I.IngredientID 
-	join Meal M on M.MealID=MI.MealID 
-	where MealID=?`
-	rows, err := store.db.QueryContext(context.Background(), ingredInq, mealID)
+	join Meals M on M.MealID=MI.MealID 
+	where M.MealID=@M_ID`
+	rows, err := store.db.QueryContext(context.Background(), ingredInq, sql.Named("M_ID", mealID))
 	if err != nil {
 		return nil, err
 	}
@@ -305,15 +314,15 @@ func (store SQLStore) GetMealIngredients(mealID int64) ([]string, error) {
 
 //GetMealDiet returns the name of restrictions the meal ingredients are part of, given a meal ID
 func (store SQLStore) GetMealDiet(mealID int64) ([]string, error) {
-	var output []string
+	output := []string{}
 	dietInq := `select R.RestrictionName
 	from Restriction R
 	join IngredientRestriction IR on IR.RestrictionID=R.RestrictionID 
-	join Ingredient I on I.IngredientID=IR.IngredientID
+	join Ingredients I on I.IngredientID=IR.IngredientID
 	join MealIngredient MI on MI.IngredientID=I.IngredientID 
-	join Meal M on M.MealID=MI.MealID 
-	where MealID=?`
-	rows, err := store.db.QueryContext(context.Background(), dietInq, mealID)
+	join Meals M on M.MealID=MI.MealID 
+	where M.MealID=@M_ID`
+	rows, err := store.db.QueryContext(context.Background(), dietInq, sql.Named("M_ID", mealID))
 	if err != nil {
 		return nil, err
 	}
@@ -333,13 +342,13 @@ func (store SQLStore) GetMealDiet(mealID int64) ([]string, error) {
 
 //GetMealTextures returns the names of textures of the meal with the given ID in slice format
 func (store SQLStore) GetMealTextures(mealID int64) ([]string, error) {
-	var output []string
+	output := []string{}
 	textInq := `select T.TextureName 
 	from Texture T
 	join MealTexture MTE on MTE.TextureID=T.TextureID 
-	join Meal M on M.MealID=MTE.MealID 
-	where MealID=?`
-	rows, err := store.db.QueryContext(context.Background(), textInq, mealID)
+	join Meals M on M.MealID=MTE.MealID 
+	where M.MealID=@M_ID`
+	rows, err := store.db.QueryContext(context.Background(), textInq, sql.Named("M_ID", mealID))
 	if err != nil {
 		return nil, err
 	}
@@ -362,9 +371,9 @@ func (store SQLStore) GetMealType(mealID int64) (string, error) {
 	var output string
 	mealTypeInq := `select MT.MealTypeName
 	from MealType MT
-	join Meal M on M.MealTypeID=MT.MealTypeID
-	where MealID=?`
-	row := store.db.QueryRowContext(context.Background(), mealTypeInq, mealID)
+	join Meals M on M.MealTypeID=MT.MealTypeID
+	where M.MealID=@M_ID`
+	row := store.db.QueryRowContext(context.Background(), mealTypeInq, sql.Named("M_ID", mealID))
 	if err := row.Scan(&output); err != nil {
 		return output, err
 	}
@@ -376,15 +385,17 @@ func (store SQLStore) GetMealType(mealID int64) (string, error) {
 
 //GetRestaurantMeals returns all the meals a restaurant with the given ID offers
 func (store SQLStore) GetRestaurantMeals(restID int64) ([]*Meal, error) {
-	var output []*Meal
-	inq := "select * from Meals where RestaurantID=?"
-	rows, err := store.db.QueryContext(context.Background(), inq, restID)
+	output := []*Meal{}
+	inq := `select MealID, MealName, MealDescr, MealCal, MealPrice, MealImg, RestaurantID, MealTypeID
+	from Meals
+	where RestaurantID=@R_ID`
+	rows, err := store.db.QueryContext(context.Background(), inq, sql.Named("R_ID", restID))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var thisMeal *Meal
+		thisMeal := &Meal{}
 		if err := rows.Scan(&thisMeal.ID, &thisMeal.Name, &thisMeal.Descr, &thisMeal.Calories, &thisMeal.Price,
 			&thisMeal.Img, &thisMeal.RestaurantID, &thisMeal.MealTypeID); err != nil {
 			return nil, err

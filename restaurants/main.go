@@ -1,4 +1,4 @@
-package restaurants
+package main
 
 import (
 	"database/sql"
@@ -11,14 +11,19 @@ import (
 func main() {
 	addr := os.Getenv("ADDR")
 	if len(addr) == 0 {
-		addr = ":80"
+		addr = ":5300"
 	}
 
 	dsn := os.Getenv("DSN")
-	db, err := sql.Open("sqlserver", dsn)
+	var db *sql.DB
+	var err error
+	db, err = sql.Open("sqlserver", dsn)
 	if err != nil {
 		fmt.Printf("error opening database: %v\n", err)
 		os.Exit(1)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatalln(err)
 	}
 	defer db.Close()
 	ctx := NewHandlerContext(db)

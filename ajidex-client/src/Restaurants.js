@@ -67,10 +67,10 @@ const testRest = {
 }
 
 //state to keep track of restaurants returned
-var state={
+ const state ={
   restaurants: [],
   specRestaurant: {},
-  error: ''
+  error: ""
 }
 
 //sends GET request to API to retrieve list of all restaurants
