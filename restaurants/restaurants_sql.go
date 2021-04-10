@@ -165,12 +165,12 @@ func (store SQLStore) GetAllRestaurants() ([]*Restaurant, error) {
 
 //GetRestaurantByName returns all restaurants with given name
 // **NOTE: may rewrite so it only returns one row
-func (store SQLStore) GetRestaurantByName(restName string) ([]*Restaurant, error) {
+func (store SQLStore) GetRestaurantsByNameMatch(restName string) ([]*Restaurant, error) {
 	output := []*Restaurant{}
 	inq := `select RestaurantID, RestaurantName, RestaurantAddress, RestaurantCity, 
 	RestaurantState, RestaurantZip, RestaurantImg, RestaurantURL
 	from Restaurants
-	where RestaurantName=@RN`
+	where RestaurantName like '%' + @RN + '%'`
 	rows, err := store.db.QueryContext(context.Background(), inq, sql.Named("RN", restName))
 	if err != nil {
 		return nil, err
@@ -207,7 +207,7 @@ func (store SQLStore) GetRestaurantByURL(restURL string) (*Restaurant, error) {
 	thisRestaurant := &Restaurant{}
 	if err := row.Scan(&thisRestaurant.ID, &thisRestaurant.Name, &thisRestaurant.Address, &thisRestaurant.City,
 		&thisRestaurant.State, &thisRestaurant.Zip, &thisRestaurant.Img, &thisRestaurant.Url); err != nil {
-		return thisRestaurant, err
+		return nil, err
 	}
 	thisRestaurant.Menu, err = store.GetRestaurantMenu(thisRestaurant.ID)
 	if err != nil {

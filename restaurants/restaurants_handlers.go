@@ -9,17 +9,32 @@ import (
 )
 
 //RestaurantHandler handles requests to the /restaurants endpoint
+//Will check for a search query as handler is used for both general retrieval and search
 func (ctx *HandlerContext) RestaurantHandler(w http.ResponseWriter, r *http.Request) {
 	//user sign in check goes here
 	switch r.Method {
 	case http.MethodGet:
-		restaurantList, err := ctx.Store.GetAllRestaurants()
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error retrieving restaurants: %v", err), http.StatusInternalServerError)
-			return
+		searchQuery := r.URL.Query().Get("name")
+		var restaurantList []*Restaurant
+		var err error
+		if len(searchQuery) != 0 {
+			restaurantList, err = ctx.Store.GetRestaurantsByNameMatch(searchQuery)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error retrieving search results: %v", err), http.StatusInternalServerError)
+				return
+			}
+			if len(restaurantList) == 0 {
+				http.Error(w, fmt.Sprint("No restaurants found"), http.StatusNotFound)
+				return
+			}
+		} else {
+			restaurantList, err = ctx.Store.GetAllRestaurants()
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error retrieving restaurants: %v", err), http.StatusInternalServerError)
+				return
+			}
 		}
 		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(restaurantList); err != nil {
 			http.Error(w, fmt.Sprintf("Error encoding JSON: %v", err), http.StatusInternalServerError)
