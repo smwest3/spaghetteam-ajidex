@@ -11,8 +11,17 @@ import Settings from './Settings.js';
 import About from './About.js';
 import Restaurants from './Restaurants.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useAuth0 } from "./react-auth0-spa";
+import LogToast from './LogToast'
 
-function App() {
+const App = () => {
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const { loading } = useAuth0();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="App">
       <Header />
@@ -27,6 +36,9 @@ function App() {
           <Route path="/restaurants" component={Restaurants} />
           <Redirect to="/" />
         </Switch>
+        {!isAuthenticated && (
+          <LogToast />
+        )}
       </main>
     </div>
   );
