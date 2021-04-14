@@ -6,10 +6,13 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useAuth0 } from "./react-auth0-spa";
 
 //Creates header
-export function Header(props) {
+export const Header = (props) => {
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const [query, setQuery] = useState();
+
   return (
     <div>
     <Navbar className="nav" fixed="top" expand="lg" variant="dark">
@@ -26,12 +29,17 @@ export function Header(props) {
           <Button className="searchbtn" type="submit" variant="outline-light">Search</Button>
         </Form>
         <Nav>
-          <NavDropdown alignRight title="Profile" id="basic-nav-dropdown">
-            <LinkContainer to="/profile"><NavDropdown.Item>Profile</NavDropdown.Item></LinkContainer>
-            <LinkContainer to="/diet"><NavDropdown.Item>My Diet</NavDropdown.Item></LinkContainer>
-            <NavDropdown.Divider />
-            <LinkContainer to="/settings"><NavDropdown.Item>Settings</NavDropdown.Item></LinkContainer>
-          </NavDropdown>
+          {!isAuthenticated && (
+             <Button className="searchbtn" variant="outline-light" onClick={() => loginWithRedirect({})}>Sign in</Button>
+          )}
+          {isAuthenticated && (
+            <NavDropdown alignRight title="Profile" id="basic-nav-dropdown">
+              <LinkContainer to="/diet"><NavDropdown.Item>My Diet</NavDropdown.Item></LinkContainer>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={() => logout()}>Log Out</NavDropdown.Item>
+            </NavDropdown>
+          )}
+
         </Nav>
       </Navbar.Collapse>
       </Navbar>
