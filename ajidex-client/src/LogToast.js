@@ -17,7 +17,6 @@ export const LogToast = () => {
       aria-atomic="true"
       style={{
         position: 'relative',
-        minHeight: '100px',
       }}
     >
       <Toast
@@ -27,6 +26,7 @@ export const LogToast = () => {
           position: 'absolute',
           top: 0,
           right: 0,
+          zIndex: 1
         }}
       >
         <Toast.Header>

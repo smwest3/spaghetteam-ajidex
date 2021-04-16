@@ -26,6 +26,9 @@ const App = () => {
     <div className="App">
       <Header />
       <main>
+        {!isAuthenticated && (
+          <LogToast />
+        )}
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/about" component={About} />
@@ -36,9 +39,6 @@ const App = () => {
           <Route path="/restaurants" component={Restaurants} />
           <Redirect to="/" />
         </Switch>
-        {!isAuthenticated && (
-          <LogToast />
-        )}
       </main>
     </div>
   );
