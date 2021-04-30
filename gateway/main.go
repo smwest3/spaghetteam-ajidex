@@ -82,6 +82,8 @@ func main() {
 		UserStore:    users.NewMSSQLStore(db),
 	}
 
+	jwtMiddleware := handlers.NewJWTMiddleWare()
+
 	restaurantAddresses := strings.Split(os.Getenv("RESTAURANTADDR"), ",")
 
 	var restaurantURLS []*url.URL
@@ -101,8 +103,8 @@ func main() {
 
 	mux.Handle("/restaurants", restaurantProxy)
 	mux.Handle("/restaurants/", restaurantProxy)
-	mux.HandleFunc("/profile", handlerctx.UsersHandler)
-	mux.HandleFunc("/profile/", handlerctx.SpecificUserHandler)
+	mux.HandleFunc("/user", handlerctx.UsersHandler)
+	mux.Handle("/profile/me", jwtMiddleware.Handler(http.HandlerFunc(handlerctx.SpecificUserHandler)))
 	mux.HandleFunc("/sessions", handlerctx.SessionsHandler)
 	mux.HandleFunc("/sessions/", handlerctx.SpecificSessionHandler)
 	wrappedMux := handlers.NewResponseHeader(mux)

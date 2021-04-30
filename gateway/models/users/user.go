@@ -14,10 +14,11 @@ var bcryptCost = 13
 
 //User represents a user account in the database
 type User struct {
-	ID       int64  `json:"id"`
-	Email    string `json:"-"` //never JSON encoded/decoded
-	PassHash []byte `json:"-"` //never JSON encoded/decoded
-	UserName string `json:"userName"`
+	ID            int64  `json:"id"`
+	Email         string `json:"-"` //never JSON encoded/decoded
+	PassHash      []byte `json:"-"` //never JSON encoded/decoded
+	UserName      string `json:"userName"`
+	EmailVerified bool   `json:"emailverified"`
 }
 
 //Credentials represents user sign-in credentials
@@ -70,9 +71,10 @@ func (nu *NewUser) ToUser() (*User, error) {
 	}
 
 	result := &User{
-		ID:       int64(0),
-		Email:    nu.Email,
-		UserName: nu.UserName,
+		ID:            int64(0),
+		Email:         nu.Email,
+		UserName:      nu.UserName,
+		EmailVerified: false,
 	}
 
 	errTwo := result.SetPassword(nu.Password)

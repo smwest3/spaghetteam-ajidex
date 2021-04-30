@@ -5,8 +5,9 @@ GO
 create table Users (
     UserID int identity(1,1) primary key,
     UserEmail varchar(80) NOT NULL,
-    UserPassHash char(60) not null,
+    UserPassHash varchar(100) not null,
     UserName varchar(80) not null,
+    EmailVerified bit,
 );
 GO
 create table Restriction (

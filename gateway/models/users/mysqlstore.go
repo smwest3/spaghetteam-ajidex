@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -22,52 +23,53 @@ func NewMSSQLStore(DB *sql.DB) *MSSQLStore {
 
 //GetByID returns the User with the given ID
 func (msq *MSSQLStore) GetByID(id int64) (*User, error) {
-	sqlQuery := "select id,email,passHash,username from Users where id=?"
-	res, err := msq.db.Query(sqlQuery, id)
-	if err != nil {
+	userNew := &User{}
+	sqlQuery := "select UserID, UserEmail, UserPassHash, UserName, EmailVerified from Users where UserID=@U_ID"
+	res := msq.db.QueryRowContext(context.Background(), sqlQuery, sql.Named("U_ID", id))
+	if err := res.Scan(&userNew.ID, &userNew.Email, &userNew.PassHash, &userNew.UserName); err != nil {
 		return nil, err
 	}
-	var userNew User
-	for res.Next() {
-		res.Scan(&userNew.ID, &userNew.Email, &userNew.PassHash, &userNew.UserName)
+	if err := res.Err(); err != nil {
+		return nil, err
 	}
-	return &userNew, err
+	return userNew, nil
 }
 
 //GetByEmail returns the User with the given email
 func (msq *MSSQLStore) GetByEmail(email string) (*User, error) {
-	sqlQuery := "select id,email,passHash,username from Users where email=?"
-	res, err := msq.db.Query(sqlQuery, email)
-	if err != nil {
+	userNew := &User{}
+	sqlQuery := "select UserID, UserEmail, UserPassHash, UserName, EmailVerified from Users where UserEmail=@UE"
+	res := msq.db.QueryRowContext(context.Background(), sqlQuery, sql.Named("UE", email))
+	if err := res.Scan(&userNew.ID, &userNew.Email, &userNew.PassHash, &userNew.UserName); err != nil {
 		return nil, err
 	}
-	var userNew User
-	for res.Next() {
-		res.Scan(&userNew.ID, &userNew.Email, &userNew.PassHash, &userNew.UserName)
+	if err := res.Err(); err != nil {
+		return nil, err
 	}
-	return &userNew, err
+	return userNew, nil
 }
 
 //GetByUserName returns the User with the given Username
 func (msq *MSSQLStore) GetByUserName(username string) (*User, error) {
-	sqlQuery := "select id,email,passHash,username from Users where username=?"
-	res, err := msq.db.Query(sqlQuery, username)
-	if err != nil {
+	userNew := &User{}
+	sqlQuery := "select UserID, UserEmail, UserPassHash, UserName, EmailVerified from Users where UserName=@UN"
+	res := msq.db.QueryRowContext(context.Background(), sqlQuery, sql.Named("UN", username))
+	if err := res.Scan(&userNew.ID, &userNew.Email, &userNew.PassHash, &userNew.UserName); err != nil {
 		return nil, err
 	}
-	var userNew User
-	for res.Next() {
-		res.Scan(&userNew.ID, &userNew.Email, &userNew.PassHash, &userNew.UserName)
+	if err := res.Err(); err != nil {
+		return nil, err
 	}
-	return &userNew, err
+	return userNew, nil
 }
 
 //Insert inserts the user into the database, and returns
 //the newly-inserted User, complete with the DBMS-assigned ID
 func (msq *MSSQLStore) Insert(user *User) (*User, error) {
-	insq := "insert into Users(email, passHash, username) values (?, ?, ?)"
-
-	res, err := msq.db.Exec(insq, user.Email, user.PassHash, user.UserName)
+	insq := `insert into Users(UserEmail, UserPassHash, UserName, EmailVerified) 
+	values (@UE, @UPH, @UN, @EV)`
+	res, err := msq.db.ExecContext(context.Background(), insq, user.Email, user.PassHash, user.UserName,
+		user.EmailVerified)
 	if err != nil {
 		return nil, err
 	}

@@ -80,14 +80,21 @@ const state = {
 };
 
 //sends GET request to API to retrieve list of all restaurants
-async function sendRestaurantRequest() {
-  const response = await fetch(api.base + api.handlers.restaurants, {
+async function sendRestaurantRequest(restName) {
+  let searchQuery = ""
+  if (restName.length != 0) {
+    searchQuery = "?name=" = restName;
+  }
+  const response = await fetch(api.base + api.handlers.restaurants, searchQuery,{
     method: "GET",
   });
   if (response.status >= 300) {
     const error = await response.text();
     state.error = error;
     return;
+  }
+  if (state.error.length != 0) {
+    state.error = "";
   }
   const restaurantList = await response.json();
   state.restaurants = restaurantList.map((restaurant) => ({
@@ -125,6 +132,9 @@ async function sendSpecRestaurantRequest(restURL) {
     state.error = error;
     return;
   }
+  if (state.error.length != 0) {
+    state.error = "";
+  }
   const restaurant = await response.json();
   state.specRestaurant = JSON.parse(JSON.stringify(restaurant));
 }
@@ -133,7 +143,7 @@ async function sendSpecRestaurantRequest(restURL) {
 function Restaurants(props) {
   let { path, url } = useRouteMatch();
 
-  //sendRestaurantRequest();
+  sendRestaurantRequest("");
   return (
     <Switch>
       <Route exact path={path}>
@@ -227,18 +237,18 @@ function RestaurantSearch(props) {
 function getSearchRests(searchTerms) {
   // sanatize the search terms.
 
-  // ping the api for restaurants with a matching name
+  await sendRestaurantRequest(searchTerms)
 
   // returns the list
-  return [testRest];
+  return [state.restaurants];
 }
 
 // Shows the page for a specific restaurant
 function Restaurant(props) {
   let { restId } = useParams();
 
-  //let rest = sendSpecRestaurantRequest(restId);
-  if (restId != "paddys-pub") {
+  await sendSpecRestaurantRequest(restId);
+  if (state.error.length != 0) {
     return <Redirect to="/Restaurants/" />;
   }
 

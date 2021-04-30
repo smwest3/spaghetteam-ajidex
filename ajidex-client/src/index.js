@@ -25,6 +25,7 @@ ReactDOM.render(
       domain={config.domain}
       client_id={config.clientId}
       redirect_uri={window.location.origin}
+      audience={config.audience}
       onRedirectCallback={onRedirectCallback}
     >
       <BrowserRouter>
