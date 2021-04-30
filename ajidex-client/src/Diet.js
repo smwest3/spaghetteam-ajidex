@@ -25,6 +25,9 @@ export const Diet = () => {
       <Badge className="menutag" variant="secondary">
         Spongy <Badge variant="light">x</Badge>
       </Badge>
+      <Badge className="menutag" variant="secondary">
+        Mushy <Badge variant="light">x</Badge>
+      </Badge>
       <br />
       <br />
       <h4>Diets</h4>
@@ -47,12 +50,18 @@ export const Diet = () => {
         />
         <Button>Search</Button>
       </Form>
-      <Badge className="menutag" variant="success">
-        Fibrous <Badge variant="light">x</Badge>
+      <Badge className="menutag" variant="dark">
+        Gluten <Badge variant="light">x</Badge>
       </Badge>
-      <Badge className="menutag" variant="success">
-        Spongy <Badge variant="light">x</Badge>
+      <Badge className="menutag" variant="dark">
+        Peanuts <Badge variant="light">x</Badge>
       </Badge>
+      <br />
+      <br />
+      <br />
+      <Button variant="success" type="submit">
+        Submit
+      </Button>
     </div>
   );
 };
