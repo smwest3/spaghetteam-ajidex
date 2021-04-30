@@ -1,70 +1,58 @@
-import React, {Row, Col} from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import React, { useState } from "react";
+import Form from "react-bootstrap/Form";
+import FormControl from "react-bootstrap/FormControl";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 
-function Diet() {
+export const Diet = () => {
   return (
     <div>
       <h1>Customize your diet</h1>
-        <Form>
-          <Form.Group as={Row} controlId="formHorizontalEmail">
-            <Form.Label column sm={2}>
-              Email
-            </Form.Label>
-            <Col sm={10}>
-              <Form.Control type="email" placeholder="Email" />
-            </Col>
-          </Form.Group>
-
-          <Form.Group as={Row} controlId="formHorizontalPassword">
-            <Form.Label column sm={2}>
-              Password
-            </Form.Label>
-            <Col sm={10}>
-              <Form.Control type="password" placeholder="Password" />
-            </Col>
-          </Form.Group>
-          <fieldset>
-            <Form.Group as={Row}>
-              <Form.Label as="legend" column sm={2}>
-                Radios
-              </Form.Label>
-              <Col sm={10}>
-                <Form.Check
-                  type="radio"
-                  label="first radio"
-                  name="formHorizontalRadios"
-                  id="formHorizontalRadios1"
-                />
-                <Form.Check
-                  type="radio"
-                  label="second radio"
-                  name="formHorizontalRadios"
-                  id="formHorizontalRadios2"
-                />
-                <Form.Check
-                  type="radio"
-                  label="third radio"
-                  name="formHorizontalRadios"
-                  id="formHorizontalRadios3"
-                />
-              </Col>
-            </Form.Group>
-          </fieldset>
-          <Form.Group as={Row} controlId="formHorizontalCheck">
-            <Col sm={{ span: 10, offset: 2 }}>
-              <Form.Check label="Remember me" />
-            </Col>
-          </Form.Group>
-
-          <Form.Group as={Row}>
-            <Col sm={{ span: 10, offset: 2 }}>
-              <Button type="submit">Sign in</Button>
-            </Col>
-          </Form.Group>
-        </Form>
+      <h4>Textures</h4>
+      <Form action="/restaurants/" method="get" autoComplete="off" inline>
+        <FormControl
+          type="text"
+          className="mr-sm-2"
+          placeholder="Search textures"
+        />
+        <Button>Search</Button>
+      </Form>
+      <Badge className="menutag" variant="secondary">
+        Fibrous <Badge variant="light">x</Badge>
+      </Badge>
+      <Badge className="menutag" variant="secondary">
+        Spongy <Badge variant="light">x</Badge>
+      </Badge>
+      <br />
+      <br />
+      <h4>Diets</h4>
+      <Form>
+        <Form.Group controlId="diet.Diets">
+          <Form.Control as="select" multiple>
+            <option>Keto</option>
+            <option>Pescatarian</option>
+            <option>Vegan</option>
+            <option>Vegetarian</option>
+          </Form.Control>
+        </Form.Group>
+      </Form>
+      <h4>Allergies</h4>
+      <Form action="/restaurants/" method="get" autoComplete="off" inline>
+        <FormControl
+          type="text"
+          className="mr-sm-2"
+          placeholder="Search ingredients"
+        />
+        <Button>Search</Button>
+      </Form>
+      <Badge className="menutag" variant="success">
+        Fibrous <Badge variant="light">x</Badge>
+      </Badge>
+      <Badge className="menutag" variant="success">
+        Spongy <Badge variant="light">x</Badge>
+      </Badge>
     </div>
   );
-}
-
-export default Diet;
+};

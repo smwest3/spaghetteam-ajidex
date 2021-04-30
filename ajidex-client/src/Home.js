@@ -1,9 +1,7 @@
-import React from 'react';
+import React from "react";
 
 function Home() {
-  return (
-    <div>This is the user's homepage</div>
-  );
+  return <div>This is Ajidex's Homepage</div>;
 }
 
 export default Home;
