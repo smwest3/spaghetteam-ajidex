@@ -81,13 +81,17 @@ const state = {
 
 //sends GET request to API to retrieve list of all restaurants
 async function sendRestaurantRequest(restName) {
-  let searchQuery = ""
+  let searchQuery = "";
   if (restName.length != 0) {
-    searchQuery = "?name=" = restName;
+    searchQuery = "?name=" + restName;
   }
-  const response = await fetch(api.base + api.handlers.restaurants, searchQuery,{
-    method: "GET",
-  });
+  const response = await fetch(
+    api.base + api.handlers.restaurants,
+    searchQuery,
+    {
+      method: "GET",
+    }
+  );
   if (response.status >= 300) {
     const error = await response.text();
     state.error = error;
@@ -234,17 +238,17 @@ function RestaurantSearch(props) {
 }
 
 // Queries the API and compiles a list of relevant restaurants based on the search terms
-function getSearchRests(searchTerms) {
+async function getSearchRests(searchTerms) {
   // sanatize the search terms.
 
-  await sendRestaurantRequest(searchTerms)
+  await sendRestaurantRequest(searchTerms);
 
   // returns the list
   return [state.restaurants];
 }
 
 // Shows the page for a specific restaurant
-function Restaurant(props) {
+async function Restaurant(props) {
   let { restId } = useParams();
 
   await sendSpecRestaurantRequest(restId);
