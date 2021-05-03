@@ -14,11 +14,17 @@ var bcryptCost = 13
 
 //User represents a user account in the database
 type User struct {
-	ID            int64  `json:"id"`
-	Email         string `json:"-"` //never JSON encoded/decoded
-	PassHash      []byte `json:"-"` //never JSON encoded/decoded
-	UserName      string `json:"userName"`
-	EmailVerified bool   `json:"emailverified"`
+	ID           int64          `json:"id"`
+	Email        string         `json:"-"` //never JSON encoded/decoded
+	PassHash     []byte         `json:"-"` //never JSON encoded/decoded
+	UserName     string         `json:"userName"`
+	Restrictions []*Restriction `json:"restrictions"`
+}
+
+//Restriction represents an individual restriction a user may have
+type Restriction struct {
+	RestrictName string `json:"restrictname"`
+	RestrictType string `json:"restricttype"`
 }
 
 //Credentials represents user sign-in credentials
@@ -29,10 +35,11 @@ type Credentials struct {
 
 //NewUser represents a new user signing up for an account
 type NewUser struct {
-	Email        string `json:"email"`
-	Password     string `json:"password"`
-	PasswordConf string `json:"passwordConf"`
-	UserName     string `json:"userName"`
+	Email        string         `json:"email"`
+	UserName     string         `json:"userName"`
+	Password     string         `json:"password"`
+	PasswordConf string         `json:"passwordConf"`
+	Restrictions []*Restriction `json:"restrictions"`
 }
 
 //Updates represents allowed updates to a user profile
@@ -71,10 +78,10 @@ func (nu *NewUser) ToUser() (*User, error) {
 	}
 
 	result := &User{
-		ID:            int64(0),
-		Email:         nu.Email,
-		UserName:      nu.UserName,
-		EmailVerified: false,
+		ID:           int64(0),
+		Email:        nu.Email,
+		UserName:     nu.UserName,
+		Restrictions: nu.Restrictions,
 	}
 
 	errTwo := result.SetPassword(nu.Password)

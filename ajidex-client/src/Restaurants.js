@@ -73,35 +73,39 @@ const testRest = {
 };
 
 //state to keep track of restaurants returned
-const state = {
-  restaurants: [],
-  specRestaurant: {},
+const subState = {
   error: "",
+  requestFinished: true,
+  loading: false,
 };
 
 //sends GET request to API to retrieve list of all restaurants
 async function sendRestaurantRequest(restName) {
+  subState.loading = true;
+  subState.requestFinished = false;
   let searchQuery = "";
   if (restName.length != 0) {
     searchQuery = "?name=" + restName;
   }
   const response = await fetch(
-    api.base + api.handlers.restaurants,
-    searchQuery,
+    api.base + api.handlers.restaurants + searchQuery,
     {
       method: "GET",
     }
   );
   if (response.status >= 300) {
     const error = await response.text();
-    state.error = error;
+    console.log(error);
+    subState.error = error;
     return;
   }
-  if (state.error.length != 0) {
-    state.error = "";
+  if (subState.error.length != 0) {
+    subState.error = "";
   }
   const restaurantList = await response.json();
-  state.restaurants = restaurantList.map((restaurant) => ({
+  subState.loading = false;
+  subState.requestFinished = true;
+  return restaurantList.map((restaurant) => ({
     id: restaurant.id,
     name: restaurant.name,
     address: restaurant.address,
@@ -114,40 +118,30 @@ async function sendRestaurantRequest(restName) {
   }));
 }
 
-//current workaround for spec restaurant caller, sets specific restaurant in state to one with given id from array
-function specRestaurantSetter(restURL) {
-  var specRest = this.state.restaurants.find((restaurant) => {
-    return restaurant.url === restURL;
-  });
-  if (typeof specRest == "undefined") {
-    state.error = "Restaurant not found";
-  } else {
-    state.specRestaurant = specRest;
-  }
-}
-
 //sends GET request to API to retrieve specific a restaurant with given URL
 async function sendSpecRestaurantRequest(restURL) {
+  subState.loading = true;
+  subState.requestFinished = false;
   const response = await fetch(api.base + api.handlers.restaurants + restURL, {
     method: "GET",
   });
   if (response.status >= 300) {
     const error = await response.text();
-    state.error = error;
+    subState.error = error;
     return;
   }
-  if (state.error.length != 0) {
-    state.error = "";
+  if (subState.error.length != 0) {
+    subState.error = "";
   }
   const restaurant = await response.json();
-  state.specRestaurant = JSON.parse(JSON.stringify(restaurant));
+  subState.loading = false;
+  subState.requestFinished = true;
+  return JSON.parse(JSON.stringify(restaurant));
 }
 
 // Decides which to show: specific restaurants or the search page
 function Restaurants(props) {
   let { path, url } = useRouteMatch();
-
-  sendRestaurantRequest("");
   return (
     <Switch>
       <Route exact path={path}>
@@ -164,34 +158,36 @@ function Restaurants(props) {
 // Shows the search page based on whatever the user searches
 function RestaurantSearch(props) {
   const [query, setQuery] = useState();
-
+  const [restaurants, setRestaurants] = useState([]);
   const { search } = window.location;
   const terms = new URLSearchParams(search).get("rest");
 
   if (terms != null && terms != "") {
-    let restaurants = getSearchRests(terms);
-
+    console.log("Sending request");
+    sendRestaurantRequest(terms).then(result => setRestaurants(result));
+    //LOADING CATCH HERE(?)
     let restItems = restaurants.map((item) => {
       return (
         <RestItem
-          key={item.Url}
-          Name={item.Name}
-          Url={item.Url}
-          Image={item.Image}
-          Address={item.Address}
-          Description={item.Description}
+          key={item.url}
+          Name={item.name}
+          Url={item.url}
+          Image={item.image}
+          Address={item.address}
+          Description={item.description}
         />
       );
     });
+    console.log(restItems.toString);
     return (
       <div>
-        <Form action="/restaurants/" method="get" autoComplete="off">
+        <Form action="/restaurants" method="get" autoComplete="off">
           <Form.Row>
             <Col>
               <FormControl
                 type="text"
                 value={query}
-                onInput={(e) => setQuery(e.target.value)}
+                onSubmit={(e) => setQuery(e.target.value)}
                 id="rest-search"
                 name="rest"
                 placeholder="Find a Restaurant"
@@ -210,13 +206,13 @@ function RestaurantSearch(props) {
   } else {
     return (
       <div>
-        <Form action="/restaurants/" method="get" autoComplete="off">
+        <Form action="/restaurants" method="get" autoComplete="off">
           <Form.Row>
             <Col>
               <FormControl
                 type="text"
                 value={query}
-                onInput={(e) => setQuery(e.target.value)}
+                onSubmit={(e) => setQuery(e.target.value)}
                 id="rest-search"
                 name="rest"
                 placeholder="Find a Restaurant"
@@ -237,59 +233,54 @@ function RestaurantSearch(props) {
   }
 }
 
-// Queries the API and compiles a list of relevant restaurants based on the search terms
-async function getSearchRests(searchTerms) {
-  // sanatize the search terms.
-
-  await sendRestaurantRequest(searchTerms);
-
-  // returns the list
-  return [state.restaurants];
-}
-
 // Shows the page for a specific restaurant
-async function Restaurant(props) {
+function Restaurant(props) {
   let { restId } = useParams();
-
-  await sendSpecRestaurantRequest(restId);
-  if (state.error.length != 0) {
+  const [restaurant, setRestaurant] = useState({});
+  sendSpecRestaurantRequest(restId).then(result => setRestaurant(result));
+  if (subState.error.length != 0) {
+    console.log(subState.error);
     return <Redirect to="/Restaurants/" />;
   }
-
-  let rest = testRest;
-
-  let menu = rest.Menu.map((cat) => {
+  let menu;
+  if (subState.loading) {
     return (
-      <div key={cat.Category}>
-        <h2>{cat.Category}</h2>{" "}
-        {cat.Items.map((item) => {
-          return (
-            <MenuItem
-              key={item.Name}
-              Name={item.Name}
-              Description={item.Description}
-              Price={item.Price}
-              Ingredients={item.Ingredients}
-              Calories={item.Calories}
-              Textures={item.Textures}
-              Diets={item.Diets}
-              Image={item.Image}
-            />
-          );
-        })}
-      </div>
-    );
-  });
+      <h2>Loading...</h2>
+    )
+  } else {
+    menu = restaurant.Menu.map((cat) => {
+      return (
+        <div key={cat.Category}>
+          <h2>{cat.Category}</h2>{" "}
+          {cat.Items.map((item) => {
+            return (
+              <MenuItem
+                key={item.Name}
+                Name={item.Name}
+                Description={item.Description}
+                Price={item.Price}
+                Ingredients={item.Ingredients}
+                Calories={item.Calories}
+                Textures={item.Textures}
+                Diets={item.Diets}
+                Image={item.Image}
+              />
+            );
+          })}
+        </div>
+      );
+    });
+  }
 
   return (
     <div>
       <div className="menutitle">
-        <h1>{rest.Name}</h1>
+        <h1>{restaurant.Name}</h1>
         <Image
           width={400}
           rounded
           fluid
-          src={rest.Image}
+          src={restaurant.Image}
           alt="A restaurant image"
         />
       </div>

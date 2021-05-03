@@ -7,13 +7,19 @@ create table Users (
     UserEmail varchar(80) NOT NULL,
     UserPassHash varchar(100) not null,
     UserName varchar(80) not null,
-    EmailVerified bit,
+);
+GO
+create table RestrictionType (
+    RestrictionTypeID int identity(1,1) primary key,
+    RestrictionTypeName varchar(80) NOT NULL,
+    RestrictionTypeDescr varchar(255)
 );
 GO
 create table Restriction (
     RestrictionID int identity(1,1) primary key,
     RestrictionName varchar(80) NOT NULL,
     RestrictionDescr varchar(255),
+    RestrictionTypeID int foreign key references RestrictionType(RestrictionTypeID) NOT NULL
 );
 GO
 create table UserRestriction (

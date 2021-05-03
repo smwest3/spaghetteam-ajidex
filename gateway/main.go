@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,9 +19,16 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-/*
-Save for later
-currSession := &handlers.SessionState{}
+// Director directs HTTPS to HTTP
+type Director func(r *http.Request)
+
+// CustomDirector creates a custom director
+// CustomDirector creates a custom director
+func CustomDirector(c *handlers.HandlerContext, targets []*url.URL) Director {
+	var counter int32
+	counter = 0
+	return func(r *http.Request) {
+		currSession := &handlers.SessionState{}
 		_, err := sessions.GetState(r, c.Key, c.SessionStore, currSession)
 		if err == nil {
 			currID := currSession.User.ID
@@ -30,16 +38,7 @@ currSession := &handlers.SessionState{}
 		} else {
 			r.Header.Set("X-User", "")
 		}
-*/
 
-// Director directs HTTPS to HTTP
-type Director func(r *http.Request)
-
-// CustomDirector creates a custom director
-func CustomDirector(c *handlers.HandlerContext, targets []*url.URL) Director {
-	var counter int32
-	counter = 0
-	return func(r *http.Request) {
 		targ := targets[int(counter)%len(targets)]
 		atomic.AddInt32(&counter, 1)
 		r.Header.Add("X-Forwarded-Host", r.Host)
@@ -82,8 +81,6 @@ func main() {
 		UserStore:    users.NewMSSQLStore(db),
 	}
 
-	jwtMiddleware := handlers.NewJWTMiddleWare()
-
 	restaurantAddresses := strings.Split(os.Getenv("RESTAURANTADDR"), ",")
 
 	var restaurantURLS []*url.URL
@@ -104,7 +101,7 @@ func main() {
 	mux.Handle("/restaurants", restaurantProxy)
 	mux.Handle("/restaurants/", restaurantProxy)
 	mux.HandleFunc("/user", handlerctx.UsersHandler)
-	mux.Handle("/profile/me", jwtMiddleware.Handler(http.HandlerFunc(handlerctx.SpecificUserHandler)))
+	mux.HandleFunc("/profile/me", handlerctx.SpecificUserHandler)
 	mux.HandleFunc("/sessions", handlerctx.SessionsHandler)
 	mux.HandleFunc("/sessions/", handlerctx.SpecificSessionHandler)
 	wrappedMux := handlers.NewResponseHeader(mux)
