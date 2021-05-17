@@ -131,7 +131,8 @@ func (msq *MSSQLStore) InsertUserRestrictions(userID int64, inputRestr []*Restri
 func (msq *MSSQLStore) Insert(user *User) (*User, error) {
 	insq := `insert into Users(UserEmail, UserPassHash, UserName) 
 	values (@UE, @UPH, @UN)`
-	res, err := msq.db.ExecContext(context.Background(), insq, user.Email, user.PassHash, user.UserName)
+	res, err := msq.db.ExecContext(context.Background(), insq, sql.Named("UE", user.Email),
+		sql.Named("UPH", user.PassHash), sql.Named("UN", user.UserName))
 	if err != nil {
 		return nil, err
 	}
