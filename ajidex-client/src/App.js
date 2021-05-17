@@ -18,36 +18,36 @@ import SignUp from "./Auth/Components/SignUp/SignUp.js";
 
 async function getCurrentUser(authToken) {
   if (!authToken) {
-      return;
+    return;
   }
-  const response = await fetch(api.base + api.handlers.myuser, {
-      headers: new Headers({
-          "Authorization": authToken
-      })
+  const response = await fetch(api.base + api.handlers.myprofile, {
+    headers: new Headers({
+      Authorization: authToken,
+    }),
   });
   if (response.status >= 300) {
-      alert("Unable to verify login. Logging out...");
-      localStorage.setItem("Authorization", "");
-      return null;
+    alert("Unable to verify login. Logging out...");
+    localStorage.setItem("Authorization", "");
+    return null;
   }
-  const user = await response.json()
-  return user
+  const user = await response.json();
+  return user;
 }
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [userRequest, setUserRequest] = useState({
-    loading: false
-  })
-  
+    loading: false,
+  });
+
   useEffect(() => {
     let authToken = localStorage.getItem("Authorization");
-    getCurrentUser(authToken).then(result => setUser(result))
-  }, [user])
+    getCurrentUser(authToken).then((result) => setUser(result));
+  }, [user]);
 
   return (
     <div className="App">
-      <Header user={user} setUser={setUser}/>
+      <Header user={user} setUser={setUser} />
       <main>
         {!user && <LogToast />}
         <Switch>
@@ -58,11 +58,11 @@ const App = () => {
           <Route exact path="/settings" component={Settings} />
           <Route path="/restaurants" component={Restaurants} />
           <Route path="/signin">
-            <SignIn setUser={setUser} />    
-          </ Route>
+            <SignIn setUser={setUser} />
+          </Route>
           <Route path="/signup">
             <SignUp setUser={setUser} />
-          </ Route>
+          </Route>
           <Redirect to="/" />
         </Switch>
       </main>

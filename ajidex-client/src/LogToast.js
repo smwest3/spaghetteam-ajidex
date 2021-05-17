@@ -1,31 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useAuth0 } from "./react-auth0-spa";
-import Toast from 'react-bootstrap/Toast';
-import ToastHeader from 'react-bootstrap/ToastHeader';
-import ToastBody from 'react-bootstrap/ToastBody';
+import Toast from "react-bootstrap/Toast";
+import ToastHeader from "react-bootstrap/ToastHeader";
+import ToastBody from "react-bootstrap/ToastBody";
 
 export const LogToast = () => {
-
   const [show, setShow] = useState(true);
 
-   const toggleShow = () => setShow(!show);
+  const toggleShow = () => setShow(!show);
 
   return (
     <div
       aria-live="polite"
       aria-atomic="true"
       style={{
-        position: 'relative',
+        position: "relative",
       }}
     >
       <Toast
         show={show}
         onClose={toggleShow}
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           right: 0,
-          zIndex: 1
+          zIndex: 1,
         }}
       >
         <Toast.Header>
@@ -33,11 +32,12 @@ export const LogToast = () => {
           <strong className="mr-auto">Sign in</strong>
           <small></small>
         </Toast.Header>
-        <Toast.Body>Click here to sign in and experience all our features!</Toast.Body>
+        <Toast.Body>
+          Click here to sign in and experience all our features!
+        </Toast.Body>
       </Toast>
     </div>
-
   );
-}
+};
 
 export default LogToast;
