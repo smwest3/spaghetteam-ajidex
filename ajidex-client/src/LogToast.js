@@ -5,7 +5,6 @@ import ToastHeader from 'react-bootstrap/ToastHeader';
 import ToastBody from 'react-bootstrap/ToastBody';
 
 export const LogToast = () => {
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
   const [show, setShow] = useState(true);
 
@@ -34,7 +33,7 @@ export const LogToast = () => {
           <strong className="mr-auto">Sign in</strong>
           <small></small>
         </Toast.Header>
-        <Toast.Body onClick={() => loginWithRedirect({})}>Click here to sign in and experience all our features!</Toast.Body>
+        <Toast.Body>Click here to sign in and experience all our features!</Toast.Body>
       </Toast>
     </div>
 

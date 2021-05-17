@@ -1,0 +1,233 @@
+  .error {
+    padding: 10px;
+    background-color: pink;
+    border: 1px solid maroon;
+    border-radius: 5px;
+}
+
+.error-hide {
+    color: black;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+  max-width: 100%;
+}
+
+body {
+	font-family: "Helvetica Neue", "Helvetica", sans-serif;
+  margin-bottom: 260px;
+  text-align: center;
+}
+
+.sign-in-page {
+  width: 500px;
+  display: inline-block;
+}
+
+.button-group button{
+  width: 100%;
+}
+
+.form {
+  background: #fff;
+  border-radius: 10px;
+  position: relative;
+  padding-right: 65px;
+  padding-left: 65px;
+  padding-bottom: 45px;
+  padding-top: 25px;
+  margin: 0px;
+  box-sizing: border-box;
+  display: block;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+}
+
+.form input[name="email"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[name="userName"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[name="firstName"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[name="lastName"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[name="passwordConf"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[name="password"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[name="bio"] {
+  color: #555555;
+  line-height: 1.2;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  height: 55px;
+  padding: 0 25px 0 25px;
+  overflow: visible;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(234, 234, 234);
+}
+
+.form input[type="submit"] {
+  text-transform: uppercase;
+  margin-top: 30px;
+  background-color: red;
+  border: none;
+  padding: 15px 30px;
+  width: 100%;
+  color: white;
+  border-radius: 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.form input[type="submit"]:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  transform: translateY(-3px);
+  cursor: pointer;
+}
+
+.form button {
+  margin-top: 20px;
+  background-color: red;
+  border: none;
+  padding: 15px 30px;
+  color: white;
+  border-radius: 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  transition: 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.form button:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  transform: translateY(-3px);
+  cursor: pointer;
+}
+
+.form span {
+  font-size: 13px;
+  color: #555555;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.container {
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+.container h1 {
+  margin-bottom: 0;
+  font-size: 40px;
+  font-weight: 500;
+}
+
+span.red {
+	color: red;
+}
+
+.logo {
+  display: inline-block;
+  text-align: center;
+}
+
+.logo img {
+  width: 450px;
+}

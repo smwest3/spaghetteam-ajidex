@@ -5,12 +5,12 @@ import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import SignOutButton from "./SignOutButton.js";
 import { LinkContainer } from "react-router-bootstrap";
 import { useAuth0 } from "./react-auth0-spa";
 
 //Creates header
-export const Header = (props) => {
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+export const Header = ({user, setUser}) => {
   const [query, setQuery] = useState();
 
   return (
@@ -47,16 +47,16 @@ export const Header = (props) => {
             </Button>
           </Form>
           <Nav>
-            {!isAuthenticated && (
+            {!user && (
               <Button
                 className="searchbtn"
                 variant="outline-light"
-                onClick={() => loginWithRedirect({})}
+                href="/signin"
               >
                 Sign in
               </Button>
             )}
-            {isAuthenticated && (
+            {user && (
               <NavDropdown alignRight title="Profile" id="basic-nav-dropdown">
                 <LinkContainer to="/diet">
                   <NavDropdown.Item>My Diet</NavDropdown.Item>
@@ -65,9 +65,7 @@ export const Header = (props) => {
                   <NavDropdown.Item>Settings</NavDropdown.Item>
                 </LinkContainer>
                 <NavDropdown.Divider />
-                <NavDropdown.Item onClick={() => logout()}>
-                  Log Out
-                </NavDropdown.Item>
+                <SignOutButton setUser={setUser} />
               </NavDropdown>
             )}
           </Nav>
