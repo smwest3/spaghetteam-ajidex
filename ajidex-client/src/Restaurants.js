@@ -162,91 +162,66 @@ function RestaurantSearch(props) {
   const { search } = window.location;
   const terms = new URLSearchParams(search).get("rest");
 
+  let restItems = null;
   if (terms != null && terms != "") {
     console.log("Sending request");
-    sendRestaurantRequest(terms).then(result => setRestaurants(result));
+    sendRestaurantRequest(terms).then((result) => setRestaurants(result));
     //LOADING CATCH HERE(?)
-    let restItems = restaurants.map((item) => {
-      return (
-        <RestItem
-          key={item.url}
-          Name={item.name}
-          Url={item.url}
-          Image={item.image}
-          Address={item.address}
-          Description={item.description}
-        />
-      );
-    });
-    console.log(restItems.toString);
-    return (
-      <div>
-        <Form action="/restaurants" method="get" autoComplete="off">
-          <Form.Row>
-            <Col>
-              <FormControl
-                type="text"
-                value={query}
-                onSubmit={(e) => setQuery(e.target.value)}
-                id="rest-search"
-                name="rest"
-                placeholder="Find a Restaurant"
-              />
-            </Col>
-            <Col>
-              <Button className="searchbtn" type="submit">
-                Search
-              </Button>
-            </Col>
-          </Form.Row>
-        </Form>
-        <div>{restItems}</div>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <Form action="/restaurants" method="get" autoComplete="off">
-          <Form.Row>
-            <Col>
-              <FormControl
-                type="text"
-                value={query}
-                onSubmit={(e) => setQuery(e.target.value)}
-                id="rest-search"
-                name="rest"
-                placeholder="Find a Restaurant"
-              />
-            </Col>
-            <Col>
-              <Button className="searchbtn" type="submit">
-                Search
-              </Button>
-            </Col>
-          </Form.Row>
-        </Form>
-        <div>
-          <p>Discover your favorite restaurants on this page!</p>
-        </div>
-      </div>
-    );
+    if (restaurants != null) {
+      restItems = restaurants.map((item) => {
+        return (
+          <RestItem
+            key={item.url}
+            Name={item.name}
+            Url={item.url}
+            Image={item.image}
+            Address={item.address}
+            Description={item.description}
+          />
+        );
+      });
+    } else {
+      restItems = "No results found";
+    }
   }
+  return (
+    <div>
+      <Form action="/restaurants" method="get" autoComplete="off">
+        <Form.Row>
+          <Col>
+            <FormControl
+              type="text"
+              value={query}
+              onSubmit={(e) => setQuery(e.target.value)}
+              id="rest-search"
+              name="rest"
+              placeholder="Find a Restaurant"
+            />
+          </Col>
+          <Col>
+            <Button className="searchbtn" type="submit">
+              Search
+            </Button>
+          </Col>
+        </Form.Row>
+      </Form>
+      <div>{restItems ? restItems : <p>Search for a restaurant above!</p>}</div>
+    </div>
+  );
 }
 
 // Shows the page for a specific restaurant
 function Restaurant(props) {
   let { restId } = useParams();
   const [restaurant, setRestaurant] = useState({});
-  sendSpecRestaurantRequest(restId).then(result => setRestaurant(result));
+  sendSpecRestaurantRequest(restId).then((result) => setRestaurant(result));
   if (subState.error.length != 0) {
     console.log(subState.error);
     return <Redirect to="/Restaurants/" />;
   }
   let menu;
   if (subState.loading) {
-    return (
-      <h2>Loading...</h2>
-    )
+    return <h2>Loading...</h2>;
   } else {
     menu = restaurant.Menu.map((cat) => {
       return (
