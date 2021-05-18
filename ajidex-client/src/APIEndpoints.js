@@ -4,7 +4,7 @@ export default {
   handlers: {
     users: "/user",
     myprofile: "/profile/me",
-    mydiet: "/diet/me",
+    mydiet: "/profile/me/diet",
     session: "/sessions",
     mysession: "/sessions/mine",
     restaurants: "/restaurants",
