@@ -94,7 +94,13 @@ class SignIn extends Component {
               <Image fluid style={{ height: "250px" }} src={logo} />
             </div>
             <div className="container">
-              <h1 style={{ textAlign: "center" }}>
+              <h1
+                style={{
+                  textAlign: "center",
+                  fontFamily: "Raleway",
+                  fontWeight: "900",
+                }}
+              >
                 Sign <span className="red">In</span>
               </h1>
             </div>
