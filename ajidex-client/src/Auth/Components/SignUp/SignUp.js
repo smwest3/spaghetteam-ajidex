@@ -91,6 +91,7 @@ class SignUp extends Component {
     localStorage.setItem("Authorization", authToken);
     this.setError("");
     const user = await response.json();
+    console.log(user)
     this.props.setUser(user);
   };
 

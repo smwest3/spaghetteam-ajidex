@@ -5,8 +5,8 @@ export default {
     users: "/user",
     myprofile: "/profile/me",
     mydiet: "/diet/me",
-    session: "/session",
-    mysession: "/session/me",
+    session: "/sessions",
+    mysession: "/sessions/mine",
     restaurants: "/restaurants",
     aRestaurant: "/restaurants/",
     /*Future endpoints:
