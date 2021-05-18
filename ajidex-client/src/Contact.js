@@ -1,8 +1,18 @@
-import React from 'react';
+import React from "react";
 
 function Contact() {
   return (
-    <div>Contact us here!</div>
+    <h1
+      style={{
+        textAlign: "center",
+        fontFamily: "Raleway",
+        fontWeight: 900,
+        marginTop: "20px",
+      }}
+    >
+      Feel free to reach out to the faces behind{" "}
+      <red style={{ color: "#CC5216" }}>Ajidex</red>
+    </h1>
   );
 }
 
