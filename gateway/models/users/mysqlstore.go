@@ -32,11 +32,7 @@ func (msq *MSSQLStore) GetByID(id int64) (*User, error) {
 	if err := res.Err(); err != nil {
 		return nil, err
 	}
-	var err error
-	userNew.Restrictions, err = msq.GetUserRestrictions(userNew)
-	if err != nil {
-		return nil, err
-	}
+
 	return userNew, nil
 }
 
@@ -49,11 +45,6 @@ func (msq *MSSQLStore) GetByEmail(email string) (*User, error) {
 		return nil, err
 	}
 	if err := res.Err(); err != nil {
-		return nil, err
-	}
-	var err error
-	userNew.Restrictions, err = msq.GetUserRestrictions(userNew)
-	if err != nil {
 		return nil, err
 	}
 	return userNew, nil
@@ -71,78 +62,26 @@ func (msq *MSSQLStore) GetByUserName(username string) (*User, error) {
 		return nil, err
 	}
 	var err error
-	userNew.Restrictions, err = msq.GetUserRestrictions(userNew)
 	if err != nil {
 		return nil, err
 	}
 	return userNew, nil
 }
 
-//GetUserRestrictions retrieves the restrictions of a particular user
-func (msq *MSSQLStore) GetUserRestrictions(user *User) ([]*Restriction, error) {
-	restrictions := []*Restriction{}
-	sqlQuery := `select RestrictionName, RestrictionType
-	from Restriction R
-	join RestrictionType RT on R.RestrictionTypeID=RT.RestrictionTypeID
-	join UserRestriction UR on R.RestrictionID=UR.RestrictionID
-	join Users U on UR.UserID=U.UserID
-	where UserID = @U_ID`
-	rows, err := msq.db.QueryContext(context.Background(), sqlQuery, sql.Named("U_ID", user.ID))
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		thisRestriction := &Restriction{}
-		if err := rows.Scan(&thisRestriction.RestrictName, &thisRestriction.RestrictType); err != nil {
-			return nil, err
-		}
-		restrictions = append(restrictions, thisRestriction)
-	}
-	if rows.Err(); err != nil {
-		return nil, err
-	}
-	return restrictions, nil
-}
-
-//InsertUserRestrictions inserts the restrictions of a particular user
-func (msq *MSSQLStore) InsertUserRestrictions(userID int64, inputRestr []*Restriction) error {
-	//IMPLEMENT ME
-	//types: texture, ingredienttype (meat, dairy etc.), allergen
-	sqlExec := `insert into UserRestriction(UserID, RestrictionID)
-	values (@U_ID, (select RestrictionID 
-					from Restriction R
-					join RestrictionType RT on R.RestrictionTypeID=RT.RestrictionTypeID
-					where R.RestrictionName = @R_N
-					and RT.RestrictionTypeName = @RT_N))`
-	for _, restrictions := range inputRestr {
-		_, err := msq.db.ExecContext(context.Background(), sqlExec,
-			sql.Named("U_ID", userID), sql.Named("R_N", restrictions.RestrictName),
-			sql.Named("RT_N", restrictions.RestrictType))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 //Insert inserts the user into the database, and returns
 //the newly-inserted User, complete with the DBMS-assigned ID
 func (msq *MSSQLStore) Insert(user *User) (*User, error) {
+	var id int64
 	insq := `insert into Users(UserEmail, UserPassHash, UserName) 
-	values (@UE, @UPH, @UN)`
-	res, err := msq.db.ExecContext(context.Background(), insq, sql.Named("UE", user.Email),
+	values (@UE, @UPH, @UN);
+	select SCOPE_IDENTITY()`
+	res := msq.db.QueryRowContext(context.Background(), insq, sql.Named("UE", user.Email),
 		sql.Named("UPH", user.PassHash), sql.Named("UN", user.UserName))
-	if err != nil {
+	//get the auto-assigned ID for the new row
+	if err := res.Scan(&id); err != nil {
 		return nil, err
 	}
-	//get the auto-assigned ID for the new row
-	id, errTwo := res.LastInsertId()
-	if errTwo != nil {
-		return nil, errTwo
-	}
-	err = msq.InsertUserRestrictions(id, user.Restrictions)
-	if err != nil {
+	if err := res.Err(); err != nil {
 		return nil, err
 	}
 	return msq.GetByID(id)

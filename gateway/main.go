@@ -82,14 +82,20 @@ func main() {
 	}
 
 	restaurantAddresses := strings.Split(os.Getenv("RESTAURANTADDR"), ",")
+	dietAddresses := strings.Split(os.Getenv("DIETADDR"), ",")
 
 	var restaurantURLS []*url.URL
+	var dietURLS []*url.URL
 
 	for _, v := range restaurantAddresses {
 		restaurantURLS = append(restaurantURLS, &url.URL{Scheme: "http", Host: v})
 	}
+	for _, v := range dietAddresses {
+		dietURLS = append(dietURLS, &url.URL{Scheme: "http", Host: v})
+	}
 
 	restaurantProxy := &httputil.ReverseProxy{Director: CustomDirector(handlerctx, restaurantURLS)}
+	dietProxy := &httputil.ReverseProxy{Director: CustomDirector(handlerctx, dietURLS)}
 
 	if len(tlsCertPath) == 0 || len(tlsKeyPath) == 0 {
 		os.Stdout.Write([]byte("Environment variables are not set"))
@@ -100,6 +106,7 @@ func main() {
 
 	mux.Handle("/restaurants", restaurantProxy)
 	mux.Handle("/restaurants/", restaurantProxy)
+	mux.Handle("/profile/me/diet", dietProxy)
 	mux.HandleFunc("/user", handlerctx.UsersHandler)
 	mux.HandleFunc("/profile/me", handlerctx.SpecificUserHandler)
 	mux.HandleFunc("/sessions", handlerctx.SessionsHandler)
