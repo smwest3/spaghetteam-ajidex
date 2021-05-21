@@ -40,12 +40,6 @@ create table Ingredients (
     IngredientTypeID int foreign key references IngredientType(IngredientTypeID) NOT NULL
 )
 GO
-create table IngredientRestriction (
-    IngredientRestrictionID int identity(1,1) primary key,
-    IngredientID int foreign key references Ingredients(IngredientID),
-    RestrictionID int foreign key references Restriction(RestrictionID)
-);
-GO
 create table Allergen (
     AllergenID int identity(1,1) primary key,
     AllergenName varchar(80) NOT NULL,
@@ -84,6 +78,12 @@ create table Meals (
     MealImg nvarchar(500),
     RestaurantID int foreign key references Restaurants(RestaurantID),
     MealTypeID int foreign key references MealType(MealTypeID)
+);
+GO
+create table MealRestriction (
+    MealRestrictionID int identity(1,1) primary key,
+    MealID int foreign key references Meals(IngredientID),
+    RestrictionID int foreign key references Restriction(RestrictionID)
 );
 GO
 create table MealIngredient (
@@ -127,8 +127,12 @@ GO
 insert into Meals values ("Sweet Potato Salad", "A sweet potato salad with only the finest leafy lettuce and thick cut sweet potatoes. Our chef's finest creation in the world. Honestly idk how he does it.",
 400, 5.20, "./img/potato_salad_template.jpg", 1, 1), ("Taco Salad", "A salad made of tacos", 450, 4.20, "https://bigoven-res.cloudinary.com/image/upload/d_recipe-no-image.jpg,t_recipe-256/spicy-dorito-taco-salad-23aed0.jpg", 1, 1), 
 ("Pork Soda", "Easy on the tongue", 200, 1.20, "https://ih1.redbubble.net/image.418980247.7118/flat,128x128,075,t-pad,128x128,f8f8f8.u3.jpg", 1, 2);
-
-
+go
+insert into MealTexture(TextureID, MealID)
+values (3, 2), (2, 2), (1, 1), (2, 1), (4, 3), (5, 3)
+go
+alter table Users
+add constraint NoDupes UNIQUE(UserEmail, UserName)
 
 --EVERYTHING BELOW THIS LINE R MY ADDITIONS TO THE CODE
 

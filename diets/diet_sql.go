@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"time"
 
 	//importing the MSSQL driver without creating a local name for the package in our code
@@ -20,6 +19,12 @@ type MSSQLStore struct {
 type Restriction struct {
 	RestrictName string `json:"restrictname"`
 	RestrictType string `json:"restricttype"`
+}
+
+type InputRestriction struct {
+	RestrictName string `json:"restrictname"`
+	RestrictType string `json:"restricttype"`
+	ActionToDo   string `json:"actiontodo"`
 }
 
 //NewSQLStore creates and returns a new SQLStore
@@ -57,29 +62,40 @@ func (msq *MSSQLStore) GetUserRestrictions(userID int64) ([]*Restriction, error)
 	return restrictions, nil
 }
 
+func (msq *MSSQLStore) EditUserRestriction(userID int64, inputRestr []InputRestriction) error {
+	for _, restriction := range inputRestr {
+		if restriction.ActionToDo == "add" {
+			if err := msq.InsertUserRestriction(userID, restriction); err != nil {
+				return err
+			}
+		} else if restriction.ActionToDo == "delete" {
+			if err := msq.DeleteUserRestriction(userID, restriction); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 //InsertUserRestrictions inserts the restrictions of a particular user
-func (msq *MSSQLStore) InsertUserRestrictions(userID int64, inputRestr []*Restriction) error {
-	//IMPLEMENT ME
-	//types: texture, ingredienttype (meat, dairy etc.), allergen
+func (msq *MSSQLStore) InsertUserRestriction(userID int64, inputRestr InputRestriction) error {
 	sqlExec := `insert into UserRestriction(UserID, RestrictionID)
 	values (@U_ID, (select RestrictionID 
 					from Restriction R
 					join RestrictionType RT on R.RestrictionTypeID=RT.RestrictionTypeID
 					where R.RestrictionName = @R_N
 					and RT.RestrictionTypeName = @RT_N))`
-	for _, restrictions := range inputRestr {
-		_, err := msq.db.ExecContext(context.Background(), sqlExec,
-			sql.Named("U_ID", userID), sql.Named("R_N", restrictions.RestrictName),
-			sql.Named("RT_N", restrictions.RestrictType))
-		if err != nil {
-			return err
-		}
+	_, err := msq.db.ExecContext(context.Background(), sqlExec,
+		sql.Named("U_ID", userID), sql.Named("R_N", inputRestr.RestrictName),
+		sql.Named("RT_N", inputRestr.RestrictType))
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 //DeleteUserRestrictions deletes specific restrictions of a particular user
-func (msq *MSSQLStore) DeleteUserRestriction(userID int64, restrToDelete []*Restriction) error {
+func (msq *MSSQLStore) DeleteUserRestriction(userID int64, restrToDelete InputRestriction) error {
 	delq := `delete from UserRestriction 
 	where UserID = @U_ID
 	and RestrictionID = (select RestrictionID 
@@ -87,12 +103,10 @@ func (msq *MSSQLStore) DeleteUserRestriction(userID int64, restrToDelete []*Rest
 		join RestrictionType RT on R.RestrictionTypeID=RT.RestrictionTypeID
 		where R.RestrictionName = @R_N
 		and RT.RestrictionTypeName = @RT_N)`
-	for _, restrictions := range restrToDelete {
-		_, err := msq.db.ExecContext(context.Background(), delq, sql.Named("U_ID", userID),
-			sql.Named("R_N", restrictions.RestrictName), sql.Named("RT_N", restrictions.RestrictType))
-		if err != nil {
-			return errors.New("error deleting User")
-		}
+	_, err := msq.db.ExecContext(context.Background(), delq, sql.Named("U_ID", userID),
+		sql.Named("R_N", restrToDelete.RestrictName), sql.Named("RT_N", restrToDelete.RestrictType))
+	if err != nil {
+		return err
 	}
 	return nil
 }

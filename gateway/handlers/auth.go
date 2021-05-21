@@ -56,6 +56,11 @@ func (c *HandlerContext) UsersHandler(w http.ResponseWriter, r *http.Request) {
 //NOTE: MAY REATTACH PATCH METHOD AT LATER POINT
 func (c *HandlerContext) SpecificUserHandler(w http.ResponseWriter, r *http.Request) {
 	currSession := &SessionState{}
+	_, err := sessions.GetState(r, c.Key, c.SessionStore, currSession)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 	urlBase := path.Base(r.URL.String())
 	id, _ := strconv.ParseInt(urlBase, 10, 64)
 

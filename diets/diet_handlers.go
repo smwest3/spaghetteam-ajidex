@@ -33,22 +33,14 @@ func (ctx *HandlerContext) SpecificUserDietHandler(w http.ResponseWriter, r *htt
 				return
 			}
 		case http.MethodPatch:
-			var inputRestr []*Restriction
-			actionQuery := r.URL.Query().Get("action")
+			var inputRestr []InputRestriction
 			if err := json.NewDecoder(r.Body).Decode(inputRestr); err != nil {
 				http.Error(w, "Error decoding diet JSON", http.StatusInternalServerError)
 				return
 			}
-			if actionQuery == "insert" {
-				if err := ctx.Store.InsertUserRestrictions(user.ID, inputRestr); err != nil {
-					http.Error(w, fmt.Sprintf("Error occurred when adding: %v", err), http.StatusInternalServerError)
-					return
-				}
-			} else if actionQuery == "delete" {
-				if err := ctx.Store.DeleteUserRestriction(user.ID, inputRestr); err != nil {
-					http.Error(w, fmt.Sprintf("Error occurred when adding: %v", err), http.StatusInternalServerError)
-					return
-				}
+			if err := ctx.Store.EditUserRestriction(user.ID, inputRestr); err != nil {
+				http.Error(w, fmt.Sprintf("Error occurred when editing restrictions: %v", err), http.StatusInternalServerError)
+				return
 			}
 			updatedRestr, err := ctx.Store.GetUserRestrictions(user.ID)
 			if err != nil {

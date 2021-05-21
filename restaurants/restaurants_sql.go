@@ -89,6 +89,7 @@ type NewMeal struct {
 	MealType       string   `json:"mealtype"`
 	Ingredients    []string `json:"ingredients"`
 	Textures       []string `json:"textures"`
+	Restrictions   []string `json:"restrictions"`
 }
 
 //Meal represents a meal from a restaurant on the website
@@ -317,11 +318,11 @@ func (store SQLStore) GetMealDiet(mealID int64) ([]string, error) {
 	output := []string{}
 	dietInq := `select R.RestrictionName
 	from Restriction R
-	join IngredientRestriction IR on IR.RestrictionID=R.RestrictionID 
-	join Ingredients I on I.IngredientID=IR.IngredientID
-	join MealIngredient MI on MI.IngredientID=I.IngredientID 
-	join Meals M on M.MealID=MI.MealID 
-	where M.MealID=@M_ID`
+	join RestrictionType RT on R.RestrictionTypeID=RT.RestrictionTypeID
+	join MealRestriction MR on MR.RestrictionID=R.RestrictionID 
+	join Meals M on M.MealID=MR.MealID 
+	where M.MealID=@M_ID
+	and RT.RestrictionTypeName = 'Diet'`
 	rows, err := store.db.QueryContext(context.Background(), dietInq, sql.Named("M_ID", mealID))
 	if err != nil {
 		return nil, err
