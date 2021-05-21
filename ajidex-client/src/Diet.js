@@ -50,7 +50,7 @@ export const Diet = () => {
     setMyDiet(
       diet.map((d) => ({
         ingredients: d.ingredients,
-        textires: d.textures,
+        textures: d.textures,
         diets: d.diets,
       }))
     );

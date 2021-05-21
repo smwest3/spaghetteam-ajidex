@@ -216,17 +216,48 @@ function RestaurantSearch(props) {
 function Restaurant(props) {
   let { restId } = useParams();
   const [restaurant, setRestaurant] = useState();
+  const [diet, setDiet] = useState();
 
   useEffect(async () => {
     sendSpecRestaurantRequest(restId).then((result) => setRestaurant(result));
+    subState.loading = true;
+    subState.requestFinished = false;
+
+    const response = await fetch(api.base + api.handlers.mydiet, {
+      method: "GET",
+      headers: new Headers({
+        Authorization: localStorage.getItem("Authorization"),
+        "Content-Type": "application/json",
+      }),
+    });
+    if (response.status >= 300) {
+      const error = await response.text();
+      console.log(error);
+      subState.error = error;
+      return;
+    }
+    if (subState.error.length != 0) {
+      subState.error = "";
+    }
+    const diet = await response.json();
+    subState.loading = false;
+    subState.requestFinished = true;
+    console.log(diet);
+    setDiet(
+      diet.map((d) => ({
+        ingredients: d.ingredients,
+        textures: d.textures,
+        diets: d.diets,
+      }))
+    );
   }, []);
 
   if (subState.error.length != 0) {
     console.log(subState.error);
-    return <Redirect to="/Restaurants/" />;
+    return <Redirect to="/restaurants/" />;
   }
   let menu;
-  if (subState.loading || restaurant == null) {
+  if (subState.loading || restaurant == null || diet == null) {
     return <h2>Loading...</h2>;
   } else {
     menu = restaurant.menu.menulist.map((cat) => {
@@ -234,19 +265,24 @@ function Restaurant(props) {
         <div key={cat.category}>
           <h2>{cat.category}</h2>{" "}
           {cat.items.map((item) => {
-            return (
-              <MenuItem
-                key={item.name}
-                Name={item.name}
-                Description={item.descr}
-                Price={item.price}
-                Ingredients={item.ingredients}
-                Calories={item.calories}
-                Textures={item.textures}
-                Diets={item.diets}
-                Image={item.img}
-              />
-            );
+            if (
+              !item.textures.some((r) => diet.textures.includes(r)) &&
+              !item.diets.some((r) => diet.diets.includes(r)) &&
+              !item.ingredients.some((r) => diet.ingredients.includes(r))
+            )
+              return (
+                <MenuItem
+                  key={item.name}
+                  Name={item.name}
+                  Description={item.descr}
+                  Price={item.price}
+                  Ingredients={item.ingredients}
+                  Calories={item.calories}
+                  Textures={item.textures}
+                  Diets={item.diets}
+                  Image={item.img}
+                />
+              );
           })}
         </div>
       );
