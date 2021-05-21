@@ -24,7 +24,7 @@ function MenuItem(props) {
       <Row>
         <Col>
           <h5>{props.Name}</h5>
-          <h6>{props.Price}</h6>
+          <h6>{"$" + props.Price}</h6>
           <p>
             {props.Description}
             <br />

@@ -6,7 +6,7 @@ import Image from "react-bootstrap/Image";
 import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
+import { Link } from "react-router-dom";
 import Col from "react-bootstrap/Col";
 import {
   Switch,
@@ -136,7 +136,6 @@ async function sendSpecRestaurantRequest(restURL) {
   const restaurant = await response.json();
   subState.loading = false;
   subState.requestFinished = true;
-  console.log(JSON.parse(JSON.stringify(restaurant)));
   return JSON.parse(JSON.stringify(restaurant));
 }
 
@@ -164,7 +163,9 @@ function RestaurantSearch(props) {
   const terms = new URLSearchParams(search).get("rest");
 
   useEffect(async () => {
-    sendRestaurantRequest(terms).then((result) => setRestaurants(result));
+    if (terms != null) {
+      sendRestaurantRequest(terms).then((result) => setRestaurants(result));
+    }
   }, []);
 
   let restItems = null;
@@ -176,14 +177,14 @@ function RestaurantSearch(props) {
             key={item.url}
             Name={item.name}
             Url={item.url}
-            Image={item.image}
+            Image={item.img}
             Address={item.address}
             Description={item.description}
           />
         );
       });
     } else {
-      restItems = "No results found";
+      restItems = "No results found (Try searching for 'paddy')";
     }
   }
   return (
@@ -242,14 +243,7 @@ function Restaurant(props) {
     const diet = await response.json();
     subState.loading = false;
     subState.requestFinished = true;
-    console.log(diet);
-    setDiet(
-      diet.map((d) => ({
-        ingredients: d.ingredients,
-        textures: d.textures,
-        diets: d.diets,
-      }))
-    );
+    setDiet(diet);
   }, []);
 
   if (subState.error.length != 0) {
@@ -257,7 +251,7 @@ function Restaurant(props) {
     return <Redirect to="/restaurants/" />;
   }
   let menu;
-  if (subState.loading || restaurant == null || diet == null) {
+  if (subState.loading || restaurant == null) {
     return <h2>Loading...</h2>;
   } else {
     menu = restaurant.menu.menulist.map((cat) => {
@@ -266,9 +260,11 @@ function Restaurant(props) {
           <h2>{cat.category}</h2>{" "}
           {cat.items.map((item) => {
             if (
-              !item.textures.some((r) => diet.textures.includes(r)) &&
-              !item.diets.some((r) => diet.diets.includes(r)) &&
-              !item.ingredients.some((r) => diet.ingredients.includes(r))
+              diet == null ||
+              (!item.textures.some((r) => diet.textures.includes(r)) &&
+                (diet.diets.length == 0 ||
+                  item.diets.some((r) => diet.diets.includes(r))) &&
+                !item.ingredients.some((r) => diet.allergens.includes(r)))
             )
               return (
                 <MenuItem
@@ -299,7 +295,32 @@ function Restaurant(props) {
             alt="A restaurant image"
           />
         </div>
-        <div className="menu">{menu}</div>
+        <div className="menu">
+          {menu}
+          <br />
+          {diet ? (
+            <p
+              style={{
+                fontFamily: "Raleway",
+              }}
+            >
+              Can't find anything to eat?
+              <Link to="/diet">
+                <p
+                  style={{
+                    fontFamily: "Raleway",
+                    color: "#CC5216",
+                    fontWeight: 700,
+                  }}
+                >
+                  Edit your diet
+                </p>
+              </Link>
+            </p>
+          ) : (
+            <br />
+          )}
+        </div>
       </div>
     );
   }

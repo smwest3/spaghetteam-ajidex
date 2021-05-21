@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
@@ -7,8 +6,6 @@ import { Header } from "./Header.js";
 import Contact from "./Contact.js";
 import Home from "./Home.js";
 import { Diet } from "./Diet.js";
-import Profile from "./Profile.js";
-import Settings from "./Settings.js";
 import About from "./About.js";
 import Restaurants from "./Restaurants.js";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -51,11 +48,10 @@ const App = () => {
       <main>
         {!user && <LogToast />}
         <Switch>
-          <Route exact path="/" component={Home} />
+          <Route exact path="/" component={About} />
           <Route exact path="/about" component={About} />
           <Route exact path="/contact" component={Contact} />
           <Route exact path="/diet" component={Diet} />
-          <Route exact path="/settings" component={Settings} />
           <Route path="/restaurants" component={Restaurants} />
           <Route path="/signin">
             <SignIn setUser={setUser} />

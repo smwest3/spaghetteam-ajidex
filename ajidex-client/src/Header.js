@@ -7,10 +7,9 @@ import Button from "react-bootstrap/Button";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import SignOutButton from "./SignOutButton.js";
 import { LinkContainer } from "react-router-bootstrap";
-import { useAuth0 } from "./react-auth0-spa";
 
 //Creates header
-export const Header = ({user, setUser}) => {
+export const Header = ({ user, setUser }) => {
   const [query, setQuery] = useState();
 
   return (
@@ -22,15 +21,12 @@ export const Header = ({user, setUser}) => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
-            <LinkContainer to="/">
-              <Nav.Link>Home</Nav.Link>
-            </LinkContainer>
             <LinkContainer to="/about">
               <Nav.Link>About</Nav.Link>
             </LinkContainer>
-            <LinkContainer to="/contact">
+            {/*<LinkContainer to="/contact">
               <Nav.Link>Contact</Nav.Link>
-            </LinkContainer>
+            </LinkContainer>*/}
           </Nav>
           <Form action="/restaurants/" method="get" autoComplete="off" inline>
             <FormControl
@@ -60,9 +56,6 @@ export const Header = ({user, setUser}) => {
               <NavDropdown alignRight title="Profile" id="basic-nav-dropdown">
                 <LinkContainer to="/diet">
                   <NavDropdown.Item>My Diet</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/settings">
-                  <NavDropdown.Item>Settings</NavDropdown.Item>
                 </LinkContainer>
                 <NavDropdown.Divider />
                 <SignOutButton setUser={setUser} />
