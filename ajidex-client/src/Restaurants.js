@@ -188,7 +188,11 @@ function RestaurantSearch(props) {
     }
   }
   return (
-    <div>
+    <div
+      style={{
+        fontFamily: "Raleway",
+      }}
+    >
       <Form action="/restaurants" method="get" autoComplete="off">
         <Form.Row>
           <Col>
@@ -284,7 +288,11 @@ function Restaurant(props) {
       );
     });
     return (
-      <div>
+      <div
+        style={{
+          fontFamily: "Raleway",
+        }}
+      >
         <div className="menutitle">
           <h1>{restaurant.name}</h1>
           <Image

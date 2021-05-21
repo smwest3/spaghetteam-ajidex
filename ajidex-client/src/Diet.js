@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import api from "./APIEndpoints";
+import { Redirect } from "react-router-dom";
 
 const testDiet = {
   allergens: ["Pork", "Sugar"],
@@ -52,6 +53,7 @@ export const Diet = () => {
 
   return (
     <div style={{ marginLeft: "5vw", marginRight: "5vw" }}>
+      {!localStorage.getItem("Authorization") && <Redirect to="/about" />}
       <h1
         style={{
           fontFamily: "Raleway",
@@ -62,7 +64,11 @@ export const Diet = () => {
         Customize your diet
       </h1>
       {myDiet ? (
-        <div>
+        <div
+          style={{
+            fontFamily: "Raleway",
+          }}
+        >
           <h4>Textures</h4>
           <Form onSubmit={onTexFormSubmit} inline>
             <Form.Control

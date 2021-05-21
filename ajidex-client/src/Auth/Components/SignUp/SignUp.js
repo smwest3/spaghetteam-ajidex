@@ -8,6 +8,7 @@ import logo from "../../../img/AjiDexSmall.png";
 import Image from "react-bootstrap/Image";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { Redirect } from "react-router-dom";
 
 /**
  * @class
@@ -27,6 +28,7 @@ class SignUp extends Component {
       password: "",
       passwordConf: "",
       error: "",
+      redir: false,
     };
 
     this.fields = [
@@ -91,8 +93,9 @@ class SignUp extends Component {
     localStorage.setItem("Authorization", authToken);
     this.setError("");
     const user = await response.json();
-    console.log(user)
+    console.log(user);
     this.props.setUser(user);
+    this.setState({ redir: true });
   };
 
   render() {
@@ -100,41 +103,45 @@ class SignUp extends Component {
     const { error } = this.state;
     return (
       <div className="sign-in-page">
-        <Row>
-          <Col>
-            <div className="logo d-flex justify-content-center">
-              <Image fluid style={{ height: "250px" }} src={logo} />
-            </div>
-            <div className="container">
-              <h1
-                style={{
-                  textAlign: "center",
-                  fontFamily: "Raleway",
-                  fontWeight: "900",
-                }}
-              >
-                Sign <span className="red">Up</span>
-              </h1>
-            </div>
-            <div className="form d-flex justify-content-center">
-              <Errors error={error} setError={this.setError} />
-            </div>
-            <div className="form d-flex justify-content-center">
-              <SignForm
-                setField={this.setField}
-                submitForm={this.submitForm}
-                values={values}
-                fields={this.fields}
-              />
-            </div>
-            <br />
-            <div className="d-flex justify-content-center">
-              <Button className="btn btn-secondary mr-2" href="/signin">
-                Already a user? Sign in!
-              </Button>
-            </div>
-          </Col>
-        </Row>
+        {this.state.redir ? (
+          <Redirect to="/diet" />
+        ) : (
+          <Row>
+            <Col>
+              <div className="logo d-flex justify-content-center">
+                <Image fluid style={{ height: "250px" }} src={logo} />
+              </div>
+              <div className="container">
+                <h1
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "Raleway",
+                    fontWeight: "900",
+                  }}
+                >
+                  Sign <span className="red">Up</span>
+                </h1>
+              </div>
+              <div className="form d-flex justify-content-center">
+                <Errors error={error} setError={this.setError} />
+              </div>
+              <div className="form d-flex justify-content-center">
+                <SignForm
+                  setField={this.setField}
+                  submitForm={this.submitForm}
+                  values={values}
+                  fields={this.fields}
+                />
+              </div>
+              <br />
+              <div className="d-flex justify-content-center">
+                <Button className="btn btn-secondary mr-2" href="/signin">
+                  Already a user? Sign in!
+                </Button>
+              </div>
+            </Col>
+          </Row>
+        )}
       </div>
     );
   }
