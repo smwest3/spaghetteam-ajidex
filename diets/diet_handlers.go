@@ -20,7 +20,7 @@ func (ctx *HandlerContext) SpecificUserDietHandler(w http.ResponseWriter, r *htt
 		}
 		switch r.Method {
 		case http.MethodGet:
-			var dietList []*Restriction
+			dietList := &ReturnDiet{}
 			dietList, err = ctx.Store.GetUserRestrictions(user.ID)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error retrieving restrictions: %v", err), http.StatusInternalServerError)
@@ -33,9 +33,9 @@ func (ctx *HandlerContext) SpecificUserDietHandler(w http.ResponseWriter, r *htt
 				return
 			}
 		case http.MethodPatch:
-			var inputRestr []InputRestriction
+			inputRestr := &InputRestriction{}
 			if err := json.NewDecoder(r.Body).Decode(inputRestr); err != nil {
-				http.Error(w, "Error decoding diet JSON", http.StatusInternalServerError)
+				http.Error(w, fmt.Sprintf("Error decoding diet JSON: %v", err), http.StatusInternalServerError)
 				return
 			}
 			if err := ctx.Store.EditUserRestriction(user.ID, inputRestr); err != nil {

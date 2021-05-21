@@ -132,8 +132,13 @@ insert into MealTexture(TextureID, MealID)
 values (3, 2), (2, 2), (1, 1), (2, 1), (4, 3), (5, 3)
 go
 alter table Users
-add constraint NoDupes UNIQUE(UserEmail, UserName)
-
+add constraint NoDupeEmails unique(UserEmail)
+go
+alter table Users
+add constraint NoDupeUsernames unique (UserName)
+go
+ALTER TABLE UserRestriction
+  ADD CONSTRAINT NoUniqueCombos UNIQUE(UserID, RestrictionID)
 --EVERYTHING BELOW THIS LINE R MY ADDITIONS TO THE CODE
 
 /*Sprocs*/
