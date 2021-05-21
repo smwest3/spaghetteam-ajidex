@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MenuItem from "./MenuItem.js";
 import RestItem from "./RestItem.js";
 import Salad from "./img/potato_salad_template.jpg";
@@ -122,7 +122,7 @@ async function sendRestaurantRequest(restName) {
 async function sendSpecRestaurantRequest(restURL) {
   subState.loading = true;
   subState.requestFinished = false;
-  const response = await fetch(api.base + api.handlers.restaurants + restURL, {
+  const response = await fetch(api.base + api.handlers.aRestaurant + restURL, {
     method: "GET",
   });
   if (response.status >= 300) {
@@ -136,6 +136,7 @@ async function sendSpecRestaurantRequest(restURL) {
   const restaurant = await response.json();
   subState.loading = false;
   subState.requestFinished = true;
+  console.log(JSON.parse(JSON.stringify(restaurant)));
   return JSON.parse(JSON.stringify(restaurant));
 }
 
@@ -162,11 +163,12 @@ function RestaurantSearch(props) {
   const { search } = window.location;
   const terms = new URLSearchParams(search).get("rest");
 
+  useEffect(async () => {
+    sendRestaurantRequest(terms).then((result) => setRestaurants(result));
+  }, []);
+
   let restItems = null;
   if (terms != null && terms != "") {
-    console.log("Sending request");
-    sendRestaurantRequest(terms).then((result) => setRestaurants(result));
-    //LOADING CATCH HERE(?)
     if (restaurants != null) {
       restItems = restaurants.map((item) => {
         return (
@@ -213,55 +215,94 @@ function RestaurantSearch(props) {
 // Shows the page for a specific restaurant
 function Restaurant(props) {
   let { restId } = useParams();
-  const [restaurant, setRestaurant] = useState({});
-  sendSpecRestaurantRequest(restId).then((result) => setRestaurant(result));
+  const [restaurant, setRestaurant] = useState();
+  const [diet, setDiet] = useState();
+
+  useEffect(async () => {
+    sendSpecRestaurantRequest(restId).then((result) => setRestaurant(result));
+    subState.loading = true;
+    subState.requestFinished = false;
+
+    const response = await fetch(api.base + api.handlers.mydiet, {
+      method: "GET",
+      headers: new Headers({
+        Authorization: localStorage.getItem("Authorization"),
+        "Content-Type": "application/json",
+      }),
+    });
+    if (response.status >= 300) {
+      const error = await response.text();
+      console.log(error);
+      subState.error = error;
+      return;
+    }
+    if (subState.error.length != 0) {
+      subState.error = "";
+    }
+    const diet = await response.json();
+    subState.loading = false;
+    subState.requestFinished = true;
+    console.log(diet);
+    setDiet(
+      diet.map((d) => ({
+        ingredients: d.ingredients,
+        textures: d.textures,
+        diets: d.diets,
+      }))
+    );
+  }, []);
+
   if (subState.error.length != 0) {
     console.log(subState.error);
-    return <Redirect to="/Restaurants/" />;
+    return <Redirect to="/restaurants/" />;
   }
   let menu;
-  if (subState.loading) {
+  if (subState.loading || restaurant == null || diet == null) {
     return <h2>Loading...</h2>;
   } else {
-    menu = restaurant.Menu.map((cat) => {
+    menu = restaurant.menu.menulist.map((cat) => {
       return (
-        <div key={cat.Category}>
-          <h2>{cat.Category}</h2>{" "}
-          {cat.Items.map((item) => {
-            return (
-              <MenuItem
-                key={item.Name}
-                Name={item.Name}
-                Description={item.Description}
-                Price={item.Price}
-                Ingredients={item.Ingredients}
-                Calories={item.Calories}
-                Textures={item.Textures}
-                Diets={item.Diets}
-                Image={item.Image}
-              />
-            );
+        <div key={cat.category}>
+          <h2>{cat.category}</h2>{" "}
+          {cat.items.map((item) => {
+            if (
+              !item.textures.some((r) => diet.textures.includes(r)) &&
+              !item.diets.some((r) => diet.diets.includes(r)) &&
+              !item.ingredients.some((r) => diet.ingredients.includes(r))
+            )
+              return (
+                <MenuItem
+                  key={item.name}
+                  Name={item.name}
+                  Description={item.descr}
+                  Price={item.price}
+                  Ingredients={item.ingredients}
+                  Calories={item.calories}
+                  Textures={item.textures}
+                  Diets={item.diets}
+                  Image={item.img}
+                />
+              );
           })}
         </div>
       );
     });
-  }
-
-  return (
-    <div>
-      <div className="menutitle">
-        <h1>{restaurant.Name}</h1>
-        <Image
-          width={400}
-          rounded
-          fluid
-          src={restaurant.Image}
-          alt="A restaurant image"
-        />
+    return (
+      <div>
+        <div className="menutitle">
+          <h1>{restaurant.name}</h1>
+          <Image
+            width={400}
+            rounded
+            fluid
+            src={restaurant.img}
+            alt="A restaurant image"
+          />
+        </div>
+        <div className="menu">{menu}</div>
       </div>
-      <div className="menu">{menu}</div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Restaurants;

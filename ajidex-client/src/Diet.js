@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import FormControl from "react-bootstrap/FormControl";
 import Badge from "react-bootstrap/Badge";
@@ -20,37 +20,41 @@ const subState = {
   loading: false,
 };
 
-//sends GET request to API to retrieve the current user's diet
-async function sendDietRequest() {
-  subState.loading = true;
-  subState.requestFinished = false;
-
-  const response = await fetch(api.base + api.handlers.mydiet, {
-    method: "GET",
-  });
-  if (response.status >= 300) {
-    const error = await response.text();
-    console.log(error);
-    subState.error = error;
-    return;
-  }
-  if (subState.error.length != 0) {
-    subState.error = "";
-  }
-  const diet = await response.json();
-  subState.loading = false;
-  subState.requestFinished = true;
-  return diet.map((d) => ({
-    ingredients: d.ingredients,
-    textires: d.textures,
-    diets: d.diets,
-  }));
-}
-
 export const Diet = () => {
   const [myDiet, setMyDiet] = useState();
-  setMyDiet(sendDietRequest());
 
+  useEffect(async () => {
+    subState.loading = true;
+    subState.requestFinished = false;
+
+    const response = await fetch(api.base + api.handlers.mydiet, {
+      method: "GET",
+      headers: new Headers({
+        Authorization: localStorage.getItem("Authorization"),
+        "Content-Type": "application/json",
+      }),
+    });
+    if (response.status >= 300) {
+      const error = await response.text();
+      console.log(error);
+      subState.error = error;
+      return;
+    }
+    if (subState.error.length != 0) {
+      subState.error = "";
+    }
+    const diet = await response.json();
+    subState.loading = false;
+    subState.requestFinished = true;
+    console.log(diet);
+    setMyDiet(
+      diet.map((d) => ({
+        ingredients: d.ingredients,
+        textures: d.textures,
+        diets: d.diets,
+      }))
+    );
+  }, []);
   return (
     <div>
       <h1>Customize your diet</h1>
